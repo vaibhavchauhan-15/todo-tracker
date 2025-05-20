@@ -14,29 +14,26 @@ import {
   useTheme,
   useMediaQuery
 } from '@mui/material';
-import { useTasks } from '../contexts/TaskContext';
+import { useTasks, Task } from '../contexts/TaskContext';
 
 interface TaskFormProps {
   open: boolean;
   onClose: () => void;
-  task?: {
-    id: string;
-    title: string;
-    status: 'completed' | 'pending';
-    priority: 'high' | 'medium' | 'low';
-    dueDate: string;
-  };
+  task?: Task;
+  user: any;
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ open, onClose, task }) => {
+const TaskForm: React.FC<TaskFormProps> = ({ open, onClose, task, user }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { addTask, updateTask } = useTasks();
   const [formData, setFormData] = useState({
     title: task?.title || '',
+    description: task?.description || '',
     status: task?.status || 'pending',
     priority: task?.priority || 'medium',
-    dueDate: task?.dueDate || new Date().toISOString().split('T')[0]
+    dueDate: task?.dueDate || new Date().toISOString().split('T')[0],
+    createdAt: task?.createdAt || new Date().toISOString()
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,8 +43,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ open, onClose, task }) => {
 
     const user = JSON.parse(auth);
     const taskData = {
-      ...formData,
-      userId: user.uid
+      userId: user.uid,
+      title: formData.title,
+      description: formData.description || '',
+      status: formData.status,
+      priority: formData.priority,
+      dueDate: formData.dueDate,
+      createdAt: formData.createdAt || new Date().toISOString()
     };
 
     if (task) {
@@ -84,6 +86,23 @@ const TaskForm: React.FC<TaskFormProps> = ({ open, onClose, task }) => {
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
+              fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: 'white',
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                  '&:hover fieldset': { borderColor: '#00bcd4' },
+                  '&.Mui-focused fieldset': { borderColor: '#00bcd4' }
+                },
+                '& .MuiInputLabel-root': { color: '#9e9e9e' },
+                '& .MuiInputLabel-root.Mui-focused': { color: '#00bcd4' }
+              }}
+            />
+
+            <TextField
+              label="Description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               fullWidth
               sx={{
                 '& .MuiOutlinedInput-root': {

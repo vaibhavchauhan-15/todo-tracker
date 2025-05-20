@@ -12,24 +12,22 @@ import {
   IconButton,
   Typography,
   Box,
-  CircularProgress
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import { CheckCircle, RadioButtonUnchecked, Delete, Edit, Save } from '@mui/icons-material';
-
-interface Todo {
-  id: string;
-  text: string;
-  completed: boolean;
-  userId: string;
-  createdAt?: Timestamp;
-}
+import { Task } from '../contexts/TaskContext';
+import { useDailyProgress } from '../contexts/DailyProgressContext';
 
 interface TodoProps {
   user: any;
 }
 
 const Todo: React.FC<TodoProps> = ({ user }) => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Task[]>([]);
   const [newTodo, setNewTodo] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,30 +35,35 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
+  const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('medium');
+  const { updateDailyProgress } = useDailyProgress();
 
   // Set up real-time listener for todos
   useEffect(() => {
-    const q = query(collection(db, 'todos'), where('userId', '==', user.uid));
+    const q = query(collection(db, 'tasks'), where('userId', '==', user.uid));
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const todoList = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      })) as Todo[];
+      })) as Task[];
       
       // Sort todos: incomplete first, then by creation date
       const sortedTodos = todoList.sort((a, b) => {
-        if (a.completed === b.completed) {
-          // If completion status is the same, sort by creation date
-          const dateA = a.createdAt?.toDate?.() || new Date(0);
-          const dateB = b.createdAt?.toDate?.() || new Date(0);
-          return dateB.getTime() - dateA.getTime(); // Newest first
+        if (a.status === b.status) {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); // Newest first
         }
-        return a.completed ? 1 : -1; // Incomplete first
+        return a.status === 'completed' ? 1 : -1; // Incomplete first
       });
       
       setTodos(sortedTodos);
       setLoading(false);
+
+      // Update daily progress
+      const today = new Date().toISOString().split('T')[0];
+      const todayTasks = todoList.filter(task => task.dueDate === today);
+      const completedTasks = todayTasks.filter(task => task.status === 'completed').length;
+      updateDailyProgress(completedTasks, todayTasks.length);
     }, (error) => {
       console.error('Error fetching todos:', error);
       setError('Failed to fetch todos');
@@ -68,7 +71,7 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
     });
 
     return () => unsubscribe();
-  }, [user.uid]);
+  }, [user.uid, updateDailyProgress]);
 
   const addTodo = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +79,7 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
 
     // Check for duplicate todos
     const isDuplicate = todos.some(
-      todo => todo.text.toLowerCase().trim() === newTodo.toLowerCase().trim()
+      todo => todo.title.toLowerCase().trim() === newTodo.toLowerCase().trim()
     );
 
     if (isDuplicate) {
@@ -85,12 +88,16 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
     }
 
     const tempId = Date.now().toString();
-    const newTodoItem = {
+    const today = new Date().toISOString().split('T')[0];
+    const newTodoItem: Task = {
       id: tempId,
-      text: newTodo,
-      completed: false,
-      userId: user.uid,
-      createdAt: Timestamp.fromDate(new Date())
+      title: newTodo,
+      description: '',
+      status: 'pending',
+      priority: priority,
+      dueDate: today,
+      createdAt: new Date().toISOString(),
+      userId: user.uid
     };
 
     // Optimistic update
@@ -100,11 +107,14 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
     setError(null); // Clear any previous errors
 
     try {
-      await addDoc(collection(db, 'todos'), {
-        text: newTodo,
-        completed: false,
-        userId: user.uid,
-        createdAt: Timestamp.fromDate(new Date())
+      await addDoc(collection(db, 'tasks'), {
+        title: newTodo,
+        description: '',
+        status: 'pending',
+        priority: priority,
+        dueDate: today,
+        createdAt: new Date().toISOString(),
+        userId: user.uid
       });
     } catch (error) {
       // Revert on error
@@ -116,22 +126,24 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
     }
   };
 
-  const toggleTodo = async (todoId: string, completed: boolean) => {
+  const toggleTodo = async (todoId: string, status: 'pending' | 'completed') => {
     if (updatingId === todoId) return;
+
+    const newStatus = status === 'completed' ? 'pending' : 'completed';
 
     // Optimistic update
     setTodos(prev => prev.map(todo => 
-      todo.id === todoId ? { ...todo, completed: !completed } : todo
+      todo.id === todoId ? { ...todo, status: newStatus } : todo
     ));
     setUpdatingId(todoId);
 
     try {
-      const todoRef = doc(db, 'todos', todoId);
-      await updateDoc(todoRef, { completed: !completed });
+      const todoRef = doc(db, 'tasks', todoId);
+      await updateDoc(todoRef, { status: newStatus });
     } catch (error) {
       // Revert on error
       setTodos(prev => prev.map(todo => 
-        todo.id === todoId ? { ...todo, completed } : todo
+        todo.id === todoId ? { ...todo, status } : todo
       ));
       const errorMessage = error instanceof Error ? error.message : 'An error occurred while updating todo';
       setError(errorMessage);
@@ -140,14 +152,16 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
     }
   };
 
-  const startEditing = (todo: Todo) => {
+  const startEditing = (todo: Task) => {
     setEditingId(todo.id);
-    setEditText(todo.text);
+    setEditText(todo.title);
+    setPriority(todo.priority);
   };
 
   const cancelEditing = () => {
     setEditingId(null);
     setEditText('');
+    setPriority('medium');
   };
 
   const updateTodoText = async (todoId: string) => {
@@ -155,10 +169,14 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
 
     setUpdatingId(todoId);
     try {
-      const todoRef = doc(db, 'todos', todoId);
-      await updateDoc(todoRef, { text: editText.trim() });
+      const todoRef = doc(db, 'tasks', todoId);
+      await updateDoc(todoRef, { 
+        title: editText.trim(),
+        priority: priority
+      });
       setEditingId(null);
       setEditText('');
+      setPriority('medium');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred while updating todo';
       setError(errorMessage);
@@ -172,7 +190,7 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
 
     setUpdatingId(todoId);
     try {
-      const todoRef = doc(db, 'todos', todoId);
+      const todoRef = doc(db, 'tasks', todoId);
       await deleteDoc(todoRef);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred while deleting todo';
@@ -202,22 +220,36 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
           </Typography>
         )}
         <form onSubmit={addTodo}>
-          <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Add a new task"
-              value={newTodo}
-              onChange={(e) => setNewTodo(e.target.value)}
-              disabled={isAdding}
-            />
-            <Button 
-              variant="contained" 
-              type="submit"
-              disabled={isAdding || !newTodo.trim()}
-            >
-              {isAdding ? 'Adding...' : 'Add'}
-            </Button>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Add a new task"
+                value={newTodo}
+                onChange={(e) => setNewTodo(e.target.value)}
+                disabled={isAdding}
+              />
+              <Button 
+                variant="contained" 
+                type="submit"
+                disabled={isAdding || !newTodo.trim()}
+              >
+                {isAdding ? 'Adding...' : 'Add'}
+              </Button>
+            </Box>
+            <FormControl fullWidth>
+              <InputLabel>Priority</InputLabel>
+              <Select
+                value={priority}
+                label="Priority"
+                onChange={(e) => setPriority(e.target.value as 'high' | 'medium' | 'low')}
+              >
+                <MenuItem value="high">High</MenuItem>
+                <MenuItem value="medium">Medium</MenuItem>
+                <MenuItem value="low">Low</MenuItem>
+              </Select>
+            </FormControl>
           </Box>
         </form>
         <List>
@@ -239,6 +271,17 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
                     onChange={(e) => setEditText(e.target.value)}
                     disabled={updatingId === todo.id}
                   />
+                  <FormControl sx={{ minWidth: 120 }}>
+                    <Select
+                      value={priority}
+                      onChange={(e) => setPriority(e.target.value as 'high' | 'medium' | 'low')}
+                      size="small"
+                    >
+                      <MenuItem value="high">High</MenuItem>
+                      <MenuItem value="medium">Medium</MenuItem>
+                      <MenuItem value="low">Low</MenuItem>
+                    </Select>
+                  </FormControl>
                   <IconButton
                     onClick={() => updateTodoText(todo.id)}
                     disabled={updatingId === todo.id || !editText.trim()}
@@ -257,23 +300,24 @@ const Todo: React.FC<TodoProps> = ({ user }) => {
               ) : (
                 <>
                   <ListItemText
-                    primary={todo.text}
+                    primary={todo.title}
+                    secondary={`Priority: ${todo.priority}`}
                     sx={{
                       '& .MuiListItemText-primary': {
-                        textDecoration: todo.completed ? 'line-through' : 'none',
-                        color: todo.completed ? 'text.secondary' : 'text.primary',
+                        textDecoration: todo.status === 'completed' ? 'line-through' : 'none',
+                        color: todo.status === 'completed' ? 'text.secondary' : 'text.primary',
                       },
                     }}
                   />
                   <ListItemSecondaryAction>
                     <IconButton
                       edge="end"
-                      onClick={() => toggleTodo(todo.id, todo.completed)}
-                      color={todo.completed ? 'success' : 'default'}
+                      onClick={() => toggleTodo(todo.id, todo.status)}
+                      color={todo.status === 'completed' ? 'success' : 'default'}
                       disabled={updatingId === todo.id}
                       sx={{ mr: 1 }}
                     >
-                      {todo.completed ? <CheckCircle /> : <RadioButtonUnchecked />}
+                      {todo.status === 'completed' ? <CheckCircle /> : <RadioButtonUnchecked />}
                     </IconButton>
                     <IconButton
                       edge="end"

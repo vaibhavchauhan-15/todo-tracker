@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Typography, Paper, AppBar, Toolbar, IconButton, Avatar, Menu, MenuItem, BottomNavigation, BottomNavigationAction } from '@mui/material';
+import { Box, Container, Typography, Paper, AppBar, Toolbar, IconButton, Avatar, Menu, MenuItem, Button, Stack, Divider } from '@mui/material';
 import Todo from './Todo';
 import Dashboard from './Dashboard';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,10 @@ import Profile from './Profile';
 import {
   Dashboard as DashboardIcon,
   List as ListIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  Home as HomeIcon,
+  Logout as LogoutIcon,
+  CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 
 interface UserData {
@@ -27,7 +30,8 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [showProfile, setShowProfile] = React.useState(false);
-  const [currentView, setCurrentView] = React.useState<'dashboard' | 'todo'>('dashboard');
+  const [currentView, setCurrentView] = React.useState<'dashboard' | 'todo'>('todo');
+  const [previousView, setPreviousView] = React.useState<'dashboard' | 'todo' | null>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -38,6 +42,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
   };
 
   const handleProfileClick = () => {
+    setPreviousView(currentView);
     setShowProfile(true);
     handleClose();
   };
@@ -52,8 +57,19 @@ const Home: React.FC<HomeProps> = ({ user }) => {
     }
   };
 
+  const handleBack = () => {
+    if (showProfile) {
+      setShowProfile(false);
+      if (previousView) {
+        setCurrentView(previousView);
+      }
+    } else {
+      setCurrentView('dashboard');
+    }
+  };
+
   if (showProfile) {
-    return <Profile user={user} onBack={() => setShowProfile(false)} />;
+    return <Profile user={user} onBack={handleBack} />;
   }
 
   return (
@@ -61,21 +77,57 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       sx={{
         minHeight: '100vh',
         background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
-        pb: 7 // Add padding bottom for the bottom navigation
       }}
     >
       <AppBar 
-        position="static" 
+        position="fixed" 
         sx={{ 
-          background: 'transparent', 
-          boxShadow: 'none',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+          background: 'rgba(26, 26, 26, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          zIndex: (theme) => theme.zIndex.drawer + 1
         }}
       >
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            {currentView === 'dashboard' ? 'Dashboard' : 'Todo List'}
-          </Typography>
+          {/* Logo and Brand */}
+          <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
+            <CheckCircleIcon sx={{ mr: 1, color: 'primary.main' }} />
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              TaskMaster
+            </Typography>
+          </Box>
+
+          {/* Navigation Links */}
+          <Stack direction="row" spacing={2} sx={{ flexGrow: 1 }}>
+            <Button
+              color="inherit"
+              startIcon={<HomeIcon />}
+              onClick={() => setCurrentView('todo')}
+              sx={{
+                color: currentView === 'todo' ? 'primary.main' : 'inherit',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                },
+              }}
+            >
+              Home
+            </Button>
+            <Button
+              color="inherit"
+              startIcon={<DashboardIcon />}
+              onClick={() => setCurrentView('dashboard')}
+              sx={{
+                color: currentView === 'dashboard' ? 'primary.main' : 'inherit',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                },
+              }}
+            >
+              Dashboard
+            </Button>
+          </Stack>
+
+          {/* User Menu */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="body1" sx={{ color: 'text.secondary' }}>
               {user.displayName}
@@ -127,53 +179,28 @@ const Home: React.FC<HomeProps> = ({ user }) => {
                 },
               }}
             >
-              <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
-              <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+              <MenuItem onClick={handleProfileClick}>
+                <PersonIcon sx={{ mr: 1 }} /> Profile
+              </MenuItem>
+              <Divider sx={{ my: 1, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+              <MenuItem onClick={handleSignOut} sx={{ color: 'error.main' }}>
+                <LogoutIcon sx={{ mr: 1 }} /> Logout
+              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="md" sx={{ mt: 4 }}>
-        {currentView === 'dashboard' ? (
-          <Dashboard user={user} />
-        ) : (
-          <Todo user={user} />
-        )}
-      </Container>
-
-      <BottomNavigation
-        value={currentView}
-        onChange={(event, newValue) => {
-          setCurrentView(newValue);
-        }}
-        sx={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          bgcolor: 'rgba(26, 26, 26, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          '& .MuiBottomNavigationAction-root': {
-            color: 'text.secondary',
-            '&.Mui-selected': {
-              color: 'primary.main',
-            },
-          },
-        }}
-      >
-        <BottomNavigationAction
-          label="Dashboard"
-          value="dashboard"
-          icon={<DashboardIcon />}
-        />
-        <BottomNavigationAction
-          label="Todo List"
-          value="todo"
-          icon={<ListIcon />}
-        />
-      </BottomNavigation>
+      {/* Main Content */}
+      <Box sx={{ pt: 8, pb: 4 }}>
+        <Container maxWidth="md">
+          {currentView === 'dashboard' ? (
+            <Dashboard user={user} />
+          ) : (
+            <Todo user={user} />
+          )}
+        </Container>
+      </Box>
     </Box>
   );
 };

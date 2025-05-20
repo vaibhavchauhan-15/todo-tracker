@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Container,
@@ -17,7 +17,8 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Chip
+  Chip,
+  CircularProgress
 } from '@mui/material';
 import {
   Assignment as TaskIcon,
@@ -27,7 +28,8 @@ import {
   CalendarToday as CalendarIcon,
   Star as StarIcon,
   MoreVert as MoreIcon,
-  Add as AddIcon
+  Add as AddIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
 import { useTasks } from '../contexts/TaskContext';
 import { useUser } from '../contexts/UserContext';
@@ -48,6 +50,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { tasks, loading, error } = useTasks();
   const { preferences } = useUser();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Calculate statistics
   const totalTasks = tasks.length;
@@ -77,10 +80,18 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    // Simulate a refresh delay
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <Typography variant="h6" color="white">Loading...</Typography>
+        <CircularProgress sx={{ color: 'primary.main' }} />
       </Box>
     );
   }
@@ -133,9 +144,26 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
               Here's your progress overview
             </Typography>
           </Box>
-          <IconButton sx={{ color: 'white' }}>
-            <MoreIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <IconButton 
+              onClick={handleRefresh}
+              sx={{ 
+                color: 'white',
+                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
+              }}
+            >
+              <RefreshIcon sx={{ 
+                animation: isRefreshing ? 'spin 1s linear infinite' : 'none',
+                '@keyframes spin': {
+                  '0%': { transform: 'rotate(0deg)' },
+                  '100%': { transform: 'rotate(360deg)' }
+                }
+              }} />
+            </IconButton>
+            <IconButton sx={{ color: 'white' }}>
+              <MoreIcon />
+            </IconButton>
+          </Box>
         </Box>
 
         {/* Progress Cards */}
@@ -308,7 +336,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                             '& .MuiListItemText-secondary': { color: '#9e9e9e' }
                           }}
                         />
-                        <Chip 
+                        <Chip
                           label={task.priority}
                           size="small"
                           sx={{ 
@@ -335,72 +363,74 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </Grid>
 
         {/* Daily Progress */}
-        <Grid item xs={12}>
-          <Paper
-            sx={{
-              p: 3,
-              background: 'rgba(26, 26, 26, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Daily Progress
-            </Typography>
-            <Box sx={{ mb: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                {completedTasks} of {preferences.dailyGoal} tasks completed
+        <Grid item xs={12} sx={{ mt: 3 }}>
+          <Card sx={{ 
+            bgcolor: 'rgba(26, 26, 26, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 2
+          }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+                Daily Progress
               </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={Math.min(dailyProgress, 100)}
-                sx={{
-                  height: 10,
-                  borderRadius: 5,
-                  mt: 1,
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  '& .MuiLinearProgress-bar': {
-                    borderRadius: 5,
-                  },
-                }}
-              />
-            </Box>
-          </Paper>
-        </Grid>
-
-        {/* Completion Rate */}
-        <Grid item xs={12}>
-          <Paper
-            sx={{
-              p: 3,
-              background: 'rgba(26, 26, 26, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Overall Progress
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box sx={{ flex: 1 }}>
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ color: '#9e9e9e' }}>
+                  {completedTasks} of {preferences.dailyGoal} tasks completed
+                </Typography>
                 <LinearProgress
                   variant="determinate"
-                  value={completionRate}
+                  value={Math.min(dailyProgress, 100)}
                   sx={{
                     height: 10,
                     borderRadius: 5,
+                    mt: 1,
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     '& .MuiLinearProgress-bar': {
                       borderRadius: 5,
+                      backgroundColor: '#00bcd4'
                     },
                   }}
                 />
               </Box>
-              <Typography variant="body2" color="text.secondary">
-                {Math.round(completionRate)}%
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Completion Rate */}
+        <Grid item xs={12} sx={{ mt: 3 }}>
+          <Card sx={{ 
+            bgcolor: 'rgba(26, 26, 26, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 2
+          }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+                Completion Rate
               </Typography>
-            </Box>
-          </Paper>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ flex: 1 }}>
+                  <LinearProgress
+                    variant="determinate"
+                    value={completionRate}
+                    sx={{
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      '& .MuiLinearProgress-bar': {
+                        borderRadius: 5,
+                        backgroundColor: '#00bcd4'
+                      },
+                    }}
+                  />
+                </Box>
+                <Typography variant="body2" sx={{ color: '#9e9e9e' }}>
+                  {Math.round(completionRate)}%
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
         </Grid>
       </Container>
     </Box>

@@ -16,6 +16,8 @@ export interface Task {
   title: string;
   description: string;
   status: 'pending' | 'completed';
+  priority: 'high' | 'medium' | 'low';
+  dueDate: string;
   createdAt: string;
   userId: string;
 }
