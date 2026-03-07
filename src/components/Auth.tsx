@@ -1,18 +1,22 @@
 import React from 'react';
-import { signInWithPopup, User } from 'firebase/auth';
-import { auth, provider } from '../firebase';
+import { supabase } from '../lib/supabaseClient';
 import { Button, Container, Typography, Box } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 
+type UserData = { uid: string; email: string | null; displayName: string | null; photoURL: string | null };
+
 interface AuthProps {
-  onAuthStateChange: (user: User | null) => void;
+  onAuthStateChange: (user: UserData | null) => void;
 }
 
 const Auth: React.FC<AuthProps> = ({ onAuthStateChange }) => {
   const signInWithGoogle = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      onAuthStateChange(result.user);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) throw error;
     } catch (error) {
       console.error('Error signing in with Google:', error);
     }

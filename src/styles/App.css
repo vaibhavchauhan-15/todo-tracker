@@ -1,0 +1,5 @@
+/* App-level styles — global styles live in index.css */
+#root {
+  min-height: 100vh;
+  background-color: #0d0d14;
+}

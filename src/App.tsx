@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Box, CircularProgress, Typography } from '@mui/material';
+import { CssBaseline, Box, Typography } from '@mui/material';
 import { getTheme } from './theme';
-import { auth } from './firebase';
-import Login from './components/Login';
-import Home from './components/Home';
-import { TaskProvider } from './contexts/TaskContext';
-import { UserProvider } from './contexts/UserContext';
-import { DailyProgressProvider } from './contexts/DailyProgressContext';
+import { supabase } from './lib/supabaseClient';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Home from './pages/Home';
 
 interface UserData {
   uid: string;
@@ -17,21 +15,11 @@ interface UserData {
   photoURL: string | null;
 }
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const auth = localStorage.getItem('user');
-  if (!auth) {
+const ProtectedRoute: React.FC<{ children: React.ReactNode; user: UserData | null }> = ({ children, user }) => {
+  if (!user) {
     return <Navigate to="/login" />;
   }
-  const user = JSON.parse(auth);
-  return (
-    <UserProvider userId={user.uid}>
-      <TaskProvider>
-        <DailyProgressProvider>
-          {children}
-        </DailyProgressProvider>
-      </TaskProvider>
-    </UserProvider>
-  );
+  return <>{children}</>;
 };
 
 const App: React.FC = () => {
@@ -39,43 +27,37 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        const userData: UserData = {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL
-        };
-        localStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const u = session.user;
+        setUser({
+          uid: u.id,
+          email: u.email ?? null,
+          displayName: u.user_metadata?.full_name || u.user_metadata?.name || null,
+          photoURL: u.user_metadata?.avatar_url || null,
+        });
       } else {
-        localStorage.removeItem('user');
         setUser(null);
       }
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => subscription.unsubscribe();
   }, []);
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          height: '100vh',
-          width: '100vw',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
-          color: 'white'
-        }}
-      >
-        <CircularProgress size={60} sx={{ color: '#00bcd4', mb: 2 }} />
-        <Typography variant="h6" sx={{ color: '#9e9e9e' }}>
-          Loading your workspace...
+      <Box sx={{
+        height: '100vh', width: '100vw',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        background: 'radial-gradient(ellipse at 50% 40%, rgba(0,188,212,0.07) 0%, transparent 60%), #0d0d14',
+        gap: 2,
+      }}>
+        <Box sx={{ width: 64, height: 64, mb: 1, animation: 'pulseGlow 2s ease infinite' }}>
+          <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        </Box>
+        <Typography variant="body2" sx={{ color: '#9e9e9e', letterSpacing: '0.08em', fontSize: 13 }}>
+          Loading workspace…
         </Typography>
       </Box>
     );
@@ -91,9 +73,13 @@ const App: React.FC = () => {
             element={user ? <Navigate to="/" /> : <Login onAuthStateChange={setUser} />} 
           />
           <Route 
+            path="/signup" 
+            element={user ? <Navigate to="/" /> : <Signup onAuthStateChange={setUser} />} 
+          />
+          <Route 
             path="/" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute user={user}>
                 <Home user={user!} />
               </ProtectedRoute>
             } 

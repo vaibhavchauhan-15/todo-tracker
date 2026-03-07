@@ -5,20 +5,23 @@ const getThemeOptions = (mode: 'light' | 'dark'): ThemeOptions => ({
     mode,
     primary: {
       main: '#00bcd4',
-      light: '#33c9dc',
-      dark: '#008394',
+      light: '#4dd0e1',
+      dark: '#0097a7',
     },
     secondary: {
-      main: '#f50057',
-      light: '#f73378',
-      dark: '#ab003c',
+      main: '#7c3aed',
+      light: '#a78bfa',
+      dark: '#5b21b6',
     },
+    success: { main: '#4caf50' },
+    warning: { main: '#ff9800' },
+    error:   { main: '#f44336' },
     background: {
-      default: mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
-      paper: mode === 'dark' ? 'rgba(26, 26, 26, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+      default: mode === 'dark' ? '#0d0d14' : '#f5f5f5',
+      paper:   mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(255, 255, 255, 0.95)',
     },
     text: {
-      primary: mode === 'dark' ? '#ffffff' : '#1a1a1a',
+      primary:   mode === 'dark' ? '#f0f0f0' : '#1a1a1a',
       secondary: mode === 'dark' ? '#9e9e9e' : '#666666',
     },
   },
@@ -27,14 +30,10 @@ const getThemeOptions = (mode: 'light' | 'dark'): ThemeOptions => ({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: mode === 'dark' ? 'rgba(26, 26, 26, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
-          border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
-          transition: 'all 0.3s ease-in-out',
-          '&:hover': {
-            border: `1px solid ${mode === 'dark' ? 'rgba(0, 188, 212, 0.3)' : 'rgba(0, 188, 212, 0.5)'}`,
-            boxShadow: `0 0 20px ${mode === 'dark' ? 'rgba(0, 188, 212, 0.1)' : 'rgba(0, 188, 212, 0.2)'}`,
-          },
+          backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(255, 255, 255, 0.97)',
+          backdropFilter: 'blur(12px)',
+          border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
+          transition: 'all 0.25s ease',
         },
       },
     },
@@ -43,24 +42,29 @@ const getThemeOptions = (mode: 'light' | 'dark'): ThemeOptions => ({
         root: {
           textTransform: 'none',
           borderRadius: 8,
-          transition: 'all 0.3s ease-in-out',
+          fontWeight: 600,
+          transition: 'all 0.25s ease',
         },
         contained: {
           background: 'linear-gradient(135deg, #00bcd4 0%, #0097a7 100%)',
-          boxShadow: '0 4px 12px rgba(0, 188, 212, 0.2)',
+          boxShadow: '0 2px 10px rgba(0, 188, 212, 0.25)',
           '&:hover': {
             background: 'linear-gradient(135deg, #0097a7 0%, #006064 100%)',
-            boxShadow: '0 6px 16px rgba(0, 188, 212, 0.3)',
-            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 16px rgba(0, 188, 212, 0.4)',
+            transform: 'translateY(-1px)',
+          },
+          '&:disabled': {
+            background: 'rgba(255,255,255,0.08)',
+            color: 'rgba(255,255,255,0.25)',
+            boxShadow: 'none',
           },
         },
         outlined: {
-          borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+          borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.2)',
           '&:hover': {
             borderColor: '#00bcd4',
-            backgroundColor: 'rgba(0, 188, 212, 0.1)',
-            boxShadow: '0 4px 12px rgba(0, 188, 212, 0.1)',
-            transform: 'translateY(-2px)',
+            backgroundColor: 'rgba(0, 188, 212, 0.08)',
+            transform: 'translateY(-1px)',
           },
         },
       },
@@ -127,17 +131,23 @@ const getThemeOptions = (mode: 'light' | 'dark'): ThemeOptions => ({
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h4: {
       fontWeight: 700,
-      background: mode === 'dark' 
-        ? 'linear-gradient(135deg, #fff 0%, #e0e0e0 100%)'
+      letterSpacing: '-0.02em',
+      background: mode === 'dark'
+        ? 'linear-gradient(135deg, #ffffff 0%, #b0b0b0 100%)'
         : 'linear-gradient(135deg, #1a1a1a 0%, #333333 100%)',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
     },
     h5: {
-      fontWeight: 600,
+      fontWeight: 700,
+      letterSpacing: '-0.01em',
     },
     h6: {
       fontWeight: 600,
+    },
+    body1: {
+      letterSpacing: '0.01em',
     },
   },
   shape: {
