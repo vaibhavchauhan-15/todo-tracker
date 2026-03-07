@@ -1,6 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { C } from './tokens';
+import Btn18 from '../ui/Btn18';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GradientText
@@ -47,7 +46,7 @@ export const SectionBadge: React.FC<{ children: React.ReactNode }> = ({ children
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PrimaryButton
+// PrimaryButton  →  Btn18 primary variant
 // ─────────────────────────────────────────────────────────────────────────────
 export const PrimaryButton: React.FC<{
   children: React.ReactNode;
@@ -55,60 +54,29 @@ export const PrimaryButton: React.FC<{
   large?: boolean;
   style?: React.CSSProperties;
 }> = ({ children, onClick, large, style }) => (
-  <motion.button
-    whileHover={{ scale: 1.04, boxShadow: '0 0 40px rgba(99,102,241,0.55)' }}
-    whileTap={{ scale: 0.97 }}
+  <Btn18
+    variant="primary"
+    size={large ? 'large' : 'default'}
     onClick={onClick}
-    style={{
-      background: `linear-gradient(135deg, ${C.accent} 0%, ${C.accentDark} 100%)`,
-      color: '#fff',
-      border: 'none',
-      borderRadius: 12,
-      padding: large ? '16px 40px' : '12px 28px',
-      fontSize: large ? 17 : 15,
-      fontWeight: 600,
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 8,
-      letterSpacing: '0.01em',
-      transition: 'box-shadow 0.3s',
-      ...style,
-    }}
+    style={style}
   >
     {children}
-  </motion.button>
+  </Btn18>
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SecondaryButton
+// SecondaryButton  →  Btn18 secondary variant
 // ─────────────────────────────────────────────────────────────────────────────
 export const SecondaryButton: React.FC<{
   children: React.ReactNode;
   onClick?: () => void;
   style?: React.CSSProperties;
 }> = ({ children, onClick, style }) => (
-  <motion.button
-    whileHover={{ scale: 1.04, background: 'rgba(255,255,255,0.1)' }}
-    whileTap={{ scale: 0.97 }}
+  <Btn18
+    variant="secondary"
     onClick={onClick}
-    style={{
-      background: 'rgba(255,255,255,0.05)',
-      color: '#fff',
-      border: '1px solid rgba(255,255,255,0.15)',
-      borderRadius: 12,
-      padding: '12px 28px',
-      fontSize: 15,
-      fontWeight: 600,
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 8,
-      letterSpacing: '0.01em',
-      transition: 'background 0.3s',
-      ...style,
-    }}
+    style={style}
   >
     {children}
-  </motion.button>
+  </Btn18>
 );

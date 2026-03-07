@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import GlowButton from '../ui/GlowButton';
+import Btn18 from '../ui/Btn18';
 import { C, EASE_OUT } from './tokens';
-import { GradientText, SecondaryButton } from './shared';
+import { GradientText } from './shared';
 
 interface NavbarProps {
   onGetStarted: () => void;
@@ -75,18 +76,9 @@ const Navbar: React.FC<NavbarProps> = ({ onGetStarted, onLogin }) => {
 
         {/* CTA */}
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <button
-            onClick={onLogin}
-            style={{
-              background: 'none', border: 'none',
-              color: C.textSecondary, fontSize: 14, fontWeight: 500,
-              cursor: 'pointer', padding: '8px 14px', transition: 'color 0.2s',
-            }}
-            onMouseEnter={(e) => ((e.target as HTMLButtonElement).style.color = '#fff')}
-            onMouseLeave={(e) => ((e.target as HTMLButtonElement).style.color = C.textSecondary)}
-          >
+          <Btn18 variant="secondary" onClick={onLogin}>
             Log in
-          </button>
+          </Btn18>
           <GlowButton onClick={onGetStarted}>Get Started Free</GlowButton>
           <button
             onClick={() => setMobileOpen(true)}
@@ -139,7 +131,7 @@ const Navbar: React.FC<NavbarProps> = ({ onGetStarted, onLogin }) => {
             ))}
 
             <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <SecondaryButton onClick={onLogin}>Log in</SecondaryButton>
+              <Btn18 variant="secondary" onClick={onLogin} style={{ width: '100%', justifyContent: 'center' }}>Log in</Btn18>
               <GlowButton onClick={onGetStarted}>Get Started Free</GlowButton>
             </div>
           </motion.div>

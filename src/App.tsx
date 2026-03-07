@@ -56,17 +56,16 @@ const App: React.FC = () => {
         background: 'var(--c-bg)',
         gap: 16,
       }}>
-        <div style={{
-          width: 48, height: 48, borderRadius: 14,
-          background: 'linear-gradient(135deg, var(--c-accent), var(--c-accent-dark))',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 24px var(--c-accent-glow)',
-          animation: 'pulseGlow 2s ease infinite',
-        }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#fff" />
-          </svg>
-        </div>
+        <img
+          src="/logo.png"
+          alt="TaskMaster"
+          style={{
+            width: 64, height: 64, objectFit: 'contain',
+            borderRadius: 16,
+            boxShadow: '0 4px 24px var(--c-accent-glow)',
+            animation: 'pulseGlow 2s ease infinite',
+          }}
+        />
         <p style={{ color: 'var(--c-text-secondary)', letterSpacing: '0.08em', fontSize: 13, margin: 0 }}>
           Loading workspace…
         </p>

@@ -21,10 +21,13 @@ const Hero: React.FC<HeroProps> = ({ onGetStarted }) => (
       padding: '120px 40px 80px',
     }}
   >
-    {/* Full-bleed background GIF */}
-    <img
-      src="/gif/hero.gif"
-      alt=""
+    {/* Full-bleed background video */}
+    <video
+      src="/video/hero.mp4"
+      autoPlay
+      loop
+      muted
+      playsInline
       aria-hidden="true"
       style={{
         position: 'absolute', inset: 0,

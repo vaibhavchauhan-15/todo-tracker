@@ -13,12 +13,13 @@ interface LayoutProps {
   onCreateTask?: () => void;
   onLogout?: () => void;
   onNavChange?: (key: string) => void;
+  streak?: number;
 }
 
 const SIDEBAR_EXPANDED  = 260;
 const SIDEBAR_COLLAPSED = 70;
 
-const Layout: React.FC<LayoutProps> = ({ user, children, onCreateTask, onLogout, onNavChange }) => {
+const Layout: React.FC<LayoutProps> = ({ user, children, onCreateTask, onLogout, onNavChange, streak }) => {
   const { expanded } = useSidebar();
 
   return (
@@ -28,6 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ user, children, onCreateTask, onLogout,
         onCreateTask={onCreateTask}
         onLogout={onLogout}
         onNavChange={onNavChange}
+        streak={streak ?? 0}
       />
 
       {/* Main content — shifts with sidebar */}

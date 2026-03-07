@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle, Sparkles } from 'lucide-react';
-import GlowButton from '../ui/GlowButton';
+import Btn18 from '../ui/Btn18';
 import { C, fadeInUp, scaleIn, staggerContainer } from './tokens';
 import { GradientText, PrimaryButton, SectionBadge } from './shared';
 
@@ -59,9 +59,9 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onGetStarted }) => (
               <span style={{ color: '#D1D5DB', fontSize: 14 }}>{f}</span>
             </div>
           ))}
-          <GlowButton onClick={onGetStarted} style={{ width: '100%', marginTop: 24 }}>
+          <Btn18 variant="primary" onClick={onGetStarted} style={{ width: '100%', marginTop: 24, justifyContent: 'center' }}>
             Get Started Free
-          </GlowButton>
+          </Btn18>
         </motion.div>
 
         {/* Pro */}

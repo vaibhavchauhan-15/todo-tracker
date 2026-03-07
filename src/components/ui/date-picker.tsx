@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import { Calendar, formatDateDisplay } from './calendar'
@@ -13,6 +13,8 @@ export interface DatePickerProps {
   className?: string
   /** Disable dates before this 'YYYY-MM-DD' string */
   minDate?: string
+  /** Override the fixed overlay container style (e.g. to constrain to a drawer) */
+  overlayStyle?: React.CSSProperties
 }
 
 // ─── DatePicker ───────────────────────────────────────────────────────────────
@@ -23,6 +25,7 @@ export function DatePicker({
   placeholder = 'Pick a date',
   className = '',
   minDate,
+  overlayStyle,
 }: DatePickerProps) {
   const [open, setOpen] = useState(false)
   const [triggerHover, setTriggerHover] = useState(false)
@@ -84,6 +87,7 @@ export function DatePicker({
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(2px)',
               padding: 16,
+              ...overlayStyle,
             }}
             onClick={() => setOpen(false)}
           >

@@ -50,6 +50,8 @@ interface ClockTimePickerProps {
   /** Optional label override */
   label?: string
   className?: string
+  /** Override the fixed overlay container style (e.g. to constrain to a drawer) */
+  overlayStyle?: React.CSSProperties
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -233,7 +235,7 @@ function ClockFace({ mode, hour12, minute, onSelect }: FaceProps) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function ClockTimePicker({ value, onChange, label, className = '' }: ClockTimePickerProps) {
+export function ClockTimePicker({ value, onChange, label, className = '', overlayStyle }: ClockTimePickerProps) {
   // Parse controlled value; fallback to 12:00 AM
   const parsed = value ? parse24h(value) : { hour12: 12, minute: 0, period: 'AM' as Period }
 
@@ -358,6 +360,7 @@ export function ClockTimePicker({ value, onChange, label, className = '' }: Cloc
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(2px)',
               padding: 16,
+              ...overlayStyle,
             }}
             onClick={() => setOpen(false)}
           >

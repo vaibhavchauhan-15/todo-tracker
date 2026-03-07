@@ -8,7 +8,7 @@ import { Priority, Category } from './types';
 
 const inputBase: React.CSSProperties = {
   width: '100%', boxSizing: 'border-box',
-  padding: '11px 14px', borderRadius: 10,
+  padding: '12px 14px', borderRadius: 10,
   background: 'var(--c-input-bg)',
   border: '1px solid var(--c-input-border)',
   color: 'var(--c-input-text)', fontSize: 14, fontFamily: 'inherit',
@@ -17,13 +17,13 @@ const inputBase: React.CSSProperties = {
 };
 
 const textareaBase: React.CSSProperties = {
-  ...inputBase, resize: 'vertical', minHeight: 88, lineHeight: 1.55,
+  ...inputBase, resize: 'vertical', minHeight: 100, lineHeight: 1.6,
 };
 
 const FL: React.FC<{ children: React.ReactNode; icon?: React.ReactNode }> = ({ children, icon }) => (
   <label style={{
     display: 'flex', alignItems: 'center', gap: 6,
-    marginBottom: 8, color: 'var(--c-text-secondary)',
+    marginBottom: 10, color: 'var(--c-text-secondary)',
     fontSize: 11, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
   }}>
     {icon && <span style={{ opacity: 0.7, display: 'flex', alignItems: 'center' }}>{icon}</span>}
@@ -45,10 +45,23 @@ interface TaskFormFieldsProps {
   onChange: (key: string, val: string) => void;
   isMobile: boolean;
   minDate?: string;
+  overlayStyle?: React.CSSProperties;
 }
 
-const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, onChange, isMobile, minDate }) => (
+const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, onChange, isMobile, minDate, overlayStyle }) => (
   <>
+    {/* Category */}
+    <div>
+      <FL icon={<Tag size={11} />}>Category</FL>
+      <CategoryPills value={form.category} onChange={c => onChange('category', c)} />
+    </div>
+
+    {/* Priority */}
+    <div>
+      <FL icon={<Flag size={11} />}>Priority</FL>
+      <PriorityPills value={form.priority} onChange={p => onChange('priority', p)} />
+    </div>
+
     {/* Title */}
     <div>
       <FL>Title *</FL>
@@ -73,41 +86,28 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, onChange, isMobil
       />
     </div>
 
-    {/* Priority + Schedule row */}
-    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
-      {/* Priority */}
-      <div>
-        <FL icon={<Flag size={11} />}>Priority</FL>
-        <PriorityPills value={form.priority} onChange={p => onChange('priority', p)} />
-      </div>
-
-      {/* Schedule */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {form.category !== 'daily' && (
-          <div>
-            <FL icon={<CalendarDays size={11} />}>Due Date</FL>
-            <DatePicker
-              value={form.dueDate}
-              onChange={v => onChange('dueDate', v)}
-              minDate={minDate}
-              placeholder="Pick a due date"
-            />
-          </div>
-        )}
+    {/* Due Date + Due Time — horizontal row */}
+    <div style={{ display: 'grid', gridTemplateColumns: form.category !== 'daily' ? '1fr 1fr' : '1fr', gap: 12 }}>
+      {form.category !== 'daily' && (
         <div>
-          <FL icon={<Clock size={11} />}>Due Time</FL>
-          <ClockTimePicker
-            value={form.dueTime}
-            onChange={v => onChange('dueTime', v)}
+          <FL icon={<CalendarDays size={11} />}>Due Date</FL>
+          <DatePicker
+            value={form.dueDate}
+            onChange={v => onChange('dueDate', v)}
+            minDate={minDate}
+            placeholder="Pick date"
+            overlayStyle={overlayStyle}
           />
         </div>
+      )}
+      <div>
+        <FL icon={<Clock size={11} />}>Due Time</FL>
+        <ClockTimePicker
+          value={form.dueTime}
+          onChange={v => onChange('dueTime', v)}
+          overlayStyle={overlayStyle}
+        />
       </div>
-    </div>
-
-    {/* Category */}
-    <div>
-      <FL icon={<Tag size={11} />}>Category</FL>
-      <CategoryPills value={form.category} onChange={c => onChange('category', c)} />
     </div>
   </>
 );

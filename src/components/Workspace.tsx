@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Sparkles, X } from 'lucide-react';
 import { Category, Task, StreakData, CATEGORIES } from './workspace/types';
 import { useIsMobile } from './workspace/useIsMobile';
 import { getTodos, createTodo, updateTodo, deleteTodo } from '../services/todoService';
-import StreakBadge from './workspace/StreakBadge';
 import EmptyState from './workspace/EmptyState';
 import DeleteDialog from './workspace/DeleteDialog';
 import TaskCard from './workspace/TaskCard';
-import AddTaskPanel from './workspace/AddTaskPanel';
-import { TaskFormData } from './workspace/TaskFormFields';
+import AITaskPanel from './AITaskPanel';
+import TaskFormFields, { TaskFormData } from './workspace/TaskFormFields';
+import Btn18 from './ui/Btn18';
+import { AITasksResult } from '../ai/groq';
 
 interface WorkspaceProps {
   user: any;
@@ -16,18 +18,25 @@ interface WorkspaceProps {
   navView?: string;
   triggerAdd?: boolean;
   onAddHandled?: () => void;
+  onStreakChange?: (count: number) => void;
+  onViewChange?: (key: string) => void;
 }
 
-const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, triggerAdd, onAddHandled }) => {
+const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, triggerAdd, onAddHandled, onStreakChange, onViewChange }) => {
   const [tasks, setTasks]               = useState<Task[]>([]);
   const [loading, setLoading]           = useState(true);
-  const [activeCategory, setCategory]   = useState<Category>(externalCategory ?? 'daily');
-  const [addOpen, setAddOpen]           = useState(false);
+  const [activeView, setActiveView]     = useState<'all' | 'completed' | Category>(
+    navView === 'all' ? 'all' : navView === 'completed' ? 'completed' : (externalCategory ?? 'daily')
+  );
+  const [panelOpen, setPanelOpen]       = useState(false);
+  const [panelMode, setPanelMode]       = useState<'add' | 'edit'>('add');
+  const [aiOpen, setAiOpen]             = useState(false);
   const [deleteId, setDeleteId]         = useState<string | null>(null);
   const [editingId, setEditingId]       = useState<string | null>(null);
   const [streak, setStreak]             = useState<StreakData>({ count: 0, lastDate: '' });
   const streakRef                       = useRef<StreakData>({ count: 0, lastDate: '' });
   const isMobile                        = useIsMobile();
+  const activeCategory: Category        = (activeView !== 'all' && activeView !== 'completed') ? activeView as Category : 'daily';
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -57,8 +66,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
       const updated: StreakData = { count: next, lastDate: todayDate };
       streakRef.current = updated;
       setStreak(updated);
+      onStreakChange?.(next);
     } else if (!anyDone) {
       setStreak(prev);
+      onStreakChange?.(prev.count);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tasks]);
@@ -66,11 +77,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
   /* ── Sync external category / view from sidebar ── */
   useEffect(() => {
     if (navView === 'all' || navView === 'completed') {
-      setAddOpen(false);
+      setActiveView(navView as 'all' | 'completed');
+      setPanelOpen(false);
       setEditingId(null);
-    } else if (externalCategory && externalCategory !== activeCategory) {
-      setCategory(externalCategory);
-      setAddOpen(false);
+    } else if (externalCategory && externalCategory !== activeView) {
+      setActiveView(externalCategory);
+      setPanelOpen(false);
       setEditingId(null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,7 +91,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
   /* ── Handle sidebar "Create Task" trigger ── */
   useEffect(() => {
     if (triggerAdd) {
-      setAddOpen(true);
+      setPanelForm({ title: '', description: '', priority: 'medium', category: activeCategory, dueDate: today, dueTime: '' });
+      setPanelMode('add');
+      setPanelOpen(true);
       onAddHandled?.();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,81 +104,139 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       if (e.key === 'n' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
-        setAddOpen(o => !o);
+        setPanelForm({ title: '', description: '', priority: 'medium', category: activeCategory, dueDate: today, dueTime: '' });
+        setPanelMode('add');
+        setPanelOpen(o => !o);
       }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ── Add form ── */
-  const [addForm, setAddForm] = useState<TaskFormData>({
+  /* ── Shared panel form ── */
+  const [panelForm, setPanelForm] = useState<TaskFormData>({
     title: '', description: '', priority: 'medium',
     category: 'daily', dueDate: today, dueTime: '',
   });
-  const [addError, setAddError] = useState<string | null>(null);
+  const [panelError, setPanelError] = useState<string | null>(null);
 
-  /* ── Edit form ── */
-  const [editForm, setEditForm] = useState<TaskFormData>({
-    title: '', description: '', priority: 'medium',
-    category: 'daily', dueDate: today, dueTime: '',
-  });
-
-  /* ── Sync add-form category to active tab ── */
+  /* ── Sync add-mode category to active tab when panel is closed ── */
   useEffect(() => {
-    if (!addOpen) setAddForm(f => ({ ...f, category: activeCategory, dueDate: today, dueTime: '' }));
-  }, [activeCategory, addOpen, today]);
+    if (!panelOpen) setPanelForm(f => ({ ...f, category: activeCategory, dueDate: today, dueTime: '' }));
+  }, [activeCategory, panelOpen, today]);
 
-  /* ── Handlers ── */
-  const handleAddChange = useCallback((key: string, val: string) => {
-    setAddForm(f => ({ ...f, [key]: val }));
+  /* ── Shared form change handler ── */
+  const handlePanelChange = useCallback((key: string, val: string) => {
+    setPanelForm(f => ({ ...f, [key]: val }));
   }, []);
 
-  const handleAddSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!addForm.title.trim()) return;
-    setAddError(null);
-    const snapshot = { ...addForm };
-    setAddForm({ title: '', description: '', priority: 'medium', category: activeCategory, dueDate: today, dueTime: '' });
-    setAddOpen(false);
-    const optimisticId = crypto.randomUUID();
-    const newTask: Task = {
-      id: optimisticId,
-      userId:      user.uid,
-      title:       snapshot.title.trim(),
-      description: snapshot.description.trim(),
-      priority:    snapshot.priority,
-      category:    snapshot.category,
-      dueDate:     snapshot.dueDate,
-      dueTime:     snapshot.dueTime,
-      status:      'pending',
-      completed:   false,
-      streak:      0,
-      lastCompletedDate: '',
-      createdAt:   new Date().toISOString(),
-      updatedAt:   new Date().toISOString(),
-    };
-    // Optimistic update — replace with real DB row when available
-    setTasks(prev => [newTask, ...prev]);
-    createTodo({
-      userId:            newTask.userId,
-      title:             newTask.title,
-      description:       newTask.description,
-      priority:          newTask.priority,
-      category:          newTask.category,
-      dueDate:           newTask.dueDate,
-      dueTime:           newTask.dueTime,
-      status:            newTask.status,
-      completed:         newTask.completed,
-      streak:            newTask.streak,
-      lastCompletedDate: newTask.lastCompletedDate,
-    })
-      .then(saved => setTasks(prev => prev.map(t => t.id === optimisticId ? saved : t)))
-      .catch(err => {
-        console.error('Failed to create task:', err);
-        setAddError('Failed to save task. Please try again.');
-        setTasks(prev => prev.filter(t => t.id !== optimisticId));
+  /* ── AI task bulk insert ── */
+  const handleAIAddTasks = useCallback(async (result: AITasksResult) => {
+    const categories = ['daily', 'weekly', 'monthly', 'yearly'] as const;
+    const allInserts = categories.flatMap(cat =>
+      result[cat].map(t => ({
+        userId:            user.uid,
+        title:             t.title.trim(),
+        description:       t.description.trim(),
+        priority:          t.priority as import('./workspace/types').Task['priority'],
+        category:          cat as string,
+        dueDate:           '',
+        dueTime:           '',
+        status:            'pending' as const,
+        completed:         false,
+        streak:            0,
+        lastCompletedDate: '',
+      }))
+    );
+    // Optimistic — add placeholders, then replace with real rows
+    const optimisticTasks: import('./workspace/types').Task[] = allInserts.map(t => ({
+      ...t,
+      id:        crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }));
+    setTasks(prev => [...optimisticTasks, ...prev]);
+    try {
+      const { createTodo: create } = await import('../services/todoService');
+      const saved = await Promise.all(allInserts.map(t => create(t)));
+      // Replace optimistic rows with DB rows
+      setTasks(prev => {
+        const optimisticIds = new Set(optimisticTasks.map(t => t.id));
+        const rest = prev.filter(t => !optimisticIds.has(t.id));
+        return [...saved, ...rest];
       });
+    } catch (err) {
+      console.error('Failed to save AI tasks:', err);
+      // Revert optimistic rows
+      setTasks(prev => prev.filter(t => !optimisticTasks.some(ot => ot.id === t.id)));
+      throw err;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.uid]);
+
+  const handlePanelSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!panelForm.title.trim()) return;
+    setPanelError(null);
+    const snapshot = { ...panelForm };
+    const isEdit = panelMode === 'edit';
+    setPanelForm({ title: '', description: '', priority: 'medium', category: activeCategory, dueDate: today, dueTime: '' });
+    setPanelOpen(false);
+
+    if (isEdit && editingId) {
+      const id = editingId;
+      setEditingId(null);
+      const patch: Partial<Task> = {
+        title:       snapshot.title.trim(),
+        description: snapshot.description.trim(),
+        priority:    snapshot.priority as Task['priority'],
+        category:    snapshot.category,
+        dueDate:     snapshot.dueDate,
+        dueTime:     snapshot.dueTime,
+        updatedAt:   new Date().toISOString(),
+      };
+      setTasks(prev => prev.map(t => t.id === id ? { ...t, ...patch } : t));
+      updateTodo(id, patch).catch(err => console.error('Failed to update task:', err));
+    } else {
+      const optimisticId = crypto.randomUUID();
+      const newTask: Task = {
+        id: optimisticId,
+        userId:      user.uid,
+        title:       snapshot.title.trim(),
+        description: snapshot.description.trim(),
+        priority:    snapshot.priority as Task['priority'],
+        category:    snapshot.category,
+        dueDate:     snapshot.dueDate,
+        dueTime:     snapshot.dueTime,
+        status:      'pending',
+        completed:   false,
+        streak:      0,
+        lastCompletedDate: '',
+        createdAt:   new Date().toISOString(),
+        updatedAt:   new Date().toISOString(),
+      };
+      setTasks(prev => [newTask, ...prev]);
+      createTodo({
+        userId:            newTask.userId,
+        title:             newTask.title,
+        description:       newTask.description,
+        priority:          newTask.priority,
+        category:          newTask.category,
+        dueDate:           newTask.dueDate,
+        dueTime:           newTask.dueTime,
+        status:            newTask.status,
+        completed:         newTask.completed,
+        streak:            newTask.streak,
+        lastCompletedDate: newTask.lastCompletedDate,
+      })
+        .then(saved => setTasks(prev => prev.map(t => t.id === optimisticId ? saved : t)))
+        .catch(err => {
+          console.error('Failed to create task:', err);
+          setPanelError('Failed to save task. Please try again.');
+          setTasks(prev => prev.filter(t => t.id !== optimisticId));
+        });
+    }
   };
 
   const handleToggle = async (id: string, status: 'pending' | 'completed') => {
@@ -231,7 +303,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
 
   const openEdit = (task: Task) => {
     setEditingId(task.id);
-    setEditForm({
+    setPanelForm({
       title:       task.title,
       description: task.description ?? '',
       priority:    task.priority ?? 'medium',
@@ -239,39 +311,16 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
       dueDate:     task.dueDate ?? today,
       dueTime:     task.dueTime ?? '',
     });
-  };
-
-  const handleEditChange = useCallback((key: string, val: string) => {
-    setEditForm(f => ({ ...f, [key]: val }));
-  }, []);
-
-  const handleEditSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingId || !editForm.title.trim()) return;
-    const snapshot = { ...editForm };
-    const id = editingId;
-    setEditingId(null);
-    const patch: Partial<Task> = {
-      title:       snapshot.title.trim(),
-      description: snapshot.description.trim(),
-      priority:    snapshot.priority as Task['priority'],
-      category:    snapshot.category,
-      dueDate:     snapshot.dueDate,
-      dueTime:     snapshot.dueTime,
-      updatedAt:   new Date().toISOString(),
-    };
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...patch } : t));
-    updateTodo(id, patch).catch(err => {
-      console.error('Failed to update task:', err);
-    });
+    setPanelMode('edit');
+    setPanelOpen(true);
   };
 
   /* ── Derived data ── */
-  const filtered = navView === 'all'
+  const filtered = activeView === 'all'
     ? tasks
-    : navView === 'completed'
+    : activeView === 'completed'
     ? tasks.filter(t => t.status === 'completed')
-    : tasks.filter(t => (t.category ?? 'daily') === activeCategory);
+    : tasks.filter(t => (t.category ?? 'daily') === activeView);
   const pending   = filtered.filter(t => t.status === 'pending').length;
   const done      = filtered.filter(t => t.status === 'completed').length;
   const total     = filtered.length;
@@ -289,23 +338,36 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
             <h1 style={{ margin: 0, color: 'var(--c-text-primary)', fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em' }}>
-              {navView === 'all' ? 'All Tasks' : navView === 'completed' ? 'Completed Tasks' : 'My Workspace'}
+              {activeView === 'all' ? 'All Tasks' : activeView === 'completed' ? 'Completed Tasks' : 'My Workspace'}
             </h1>
             <p style={{ margin: '4px 0 0', color: 'var(--c-text-secondary)', fontSize: 14 }}>
               {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
             </p>
           </div>
 
-          {activeCategory === 'daily' && <StreakBadge count={streak.count} />}
+          {activeView !== 'completed' && (
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Btn18
+                type="button"
+                onClick={() => setAiOpen(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, padding: '9px 16px' }}
+              >
+                <Sparkles size={14} strokeWidth={2} /> AI Generate
+              </Btn18>
+              <Btn18 onClick={() => { setPanelForm({ title: '', description: '', priority: 'medium', category: activeCategory, dueDate: today, dueTime: '' }); setPanelMode('add'); setPanelOpen(true); }} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, padding: '9px 18px' }}>
+                <Plus size={14} strokeWidth={2.5} /> Add Task
+              </Btn18>
+            </div>
+          )}
         </div>
       </motion.div>
 
-      {/* ── Category Tabs — hidden on 'all' and 'completed' views ── */}
+      {/* ── Unified View Tabs ── */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.06 }}
-        style={{ marginBottom: 24, display: navView === 'all' || navView === 'completed' ? 'none' : undefined }}
+        style={{ marginBottom: 24 }}
       >
         <div style={{
           display: 'flex', gap: 2, padding: '4px',
@@ -315,13 +377,17 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
           overflowX: isMobile ? 'auto' : 'visible',
           position: 'relative',
         }}>
-          {CATEGORIES.map(cat => {
-            const active = activeCategory === cat.key;
+          {([
+            ...CATEGORIES,
+            { key: 'all', label: 'All Tasks' },
+            { key: 'completed', label: 'Completed' },
+          ] as { key: string; label: string }[]).map(tab => {
+            const active = activeView === tab.key;
             return (
               <button
-                key={cat.key}
+                key={tab.key}
                 type="button"
-                onClick={() => { setCategory(cat.key); setAddOpen(false); setEditingId(null); }}
+                onClick={() => { setActiveView(tab.key as 'all' | 'completed' | Category); setPanelOpen(false); setEditingId(null); onViewChange?.(tab.key); }}
                 aria-selected={active}
                 role="tab"
                 style={{
@@ -332,6 +398,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
                   color: active ? '#fff' : 'var(--c-text-secondary)',
                   transition: 'color 0.2s ease',
                   zIndex: 1, outline: 'none',
+                  whiteSpace: 'nowrap',
                 }}
                 onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-accent)'; } }}
                 onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-secondary)'; } }}
@@ -348,7 +415,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
                     }}
                   />
                 )}
-                {cat.label}
+                {tab.label}
               </button>
             );
           })}
@@ -383,23 +450,6 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
         ))}
       </motion.div>
 
-      {/* ── Add Task Panel ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.14 }}
-        style={{ marginBottom: 24 }}
-      >
-        <AddTaskPanel
-          isOpen={addOpen}
-          onToggle={() => setAddOpen(o => !o)}
-          form={addForm}
-          onChange={handleAddChange}
-          onSubmit={handleAddSubmit}
-          error={addError}
-        />
-      </motion.div>
-
       {/* ── Task List ── */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--c-text-secondary)', fontSize: 14 }}>
@@ -420,15 +470,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
                     key={task.id}
                     task={task}
                     index={i}
-                    editingId={editingId}
-                    editForm={editForm}
-                    isSaving={false}
                     onToggle={handleToggle}
                     onDeleteClick={id => setDeleteId(id)}
                     onEditOpen={openEdit}
-                    onEditChange={handleEditChange}
-                    onEditSave={handleEditSave}
-                    onEditCancel={() => setEditingId(null)}
                   />
                 ))}
               </AnimatePresence>
@@ -447,6 +491,120 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
           />
         )}
       </AnimatePresence>
+
+      {/* ── Add / Edit Task Drawer ── */}
+      <AnimatePresence>
+        {panelOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="panel-backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => { setPanelOpen(false); setEditingId(null); }}
+              style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(2px)' }}
+            />
+            {/* Drawer */}
+            <motion.div
+              key="panel-drawer"
+              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+              transition={{ duration: 0.32, ease: [0.4, 0, 0.2, 1] }}
+              style={{
+                position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 1000,
+                width: isMobile ? '100vw' : 460,
+                background: 'var(--c-bg-card)',
+                borderLeft: '1px solid var(--c-border-accent)',
+                borderRadius: isMobile ? 0 : '20px 0 0 20px',
+                boxShadow: '-12px 0 48px rgba(0,0,0,0.35)',
+                display: 'flex', flexDirection: 'column', overflow: 'hidden',
+              }}
+            >
+              {/* Header */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '20px 24px', borderBottom: '1px solid var(--c-border)', flexShrink: 0,
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--c-accent)', fontSize: 16, fontWeight: 700 }}>
+                  <span style={{ width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--c-accent-bg-hover)' }}>
+                    <Plus size={15} color="#c4b5fd" strokeWidth={2.5} />
+                  </span>
+                  {panelMode === 'edit' ? 'Edit Task' : 'Add Task'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => { setPanelOpen(false); setEditingId(null); }}
+                  style={{ width: 32, height: 32, borderRadius: 8, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.85)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.5)'; }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              {/* Form */}
+              <form onSubmit={handlePanelSubmit} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <div style={{ flex: 1, overflowY: 'auto', padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  <TaskFormFields
+                    form={panelForm}
+                    onChange={handlePanelChange}
+                    isMobile={isMobile}
+                    minDate={today}
+                    overlayStyle={isMobile ? undefined : { left: 'auto', right: 0, width: 460 }}
+                  />
+                  {panelError && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 14px', borderRadius: 9, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)' }}>
+                      <X size={13} color="#f87171" />
+                      <p style={{ margin: 0, color: '#f87171', fontSize: 13 }}>{panelError}</p>
+                    </div>
+                  )}
+                </div>
+                <div style={{ flexShrink: 0, borderTop: '1px solid var(--c-border)', padding: '16px 24px', display: 'flex', gap: 10, justifyContent: 'flex-end', alignItems: 'center', background: 'var(--c-bg-card)' }}>
+                  <button
+                    type="button"
+                    onClick={() => { setPanelOpen(false); setEditingId(null); }}
+                    style={{
+                      padding: '9px 20px', borderRadius: 10, cursor: 'pointer',
+                      fontFamily: 'inherit', fontSize: 13, fontWeight: 600,
+                      border: '1px solid var(--c-border-strong)',
+                      background: 'var(--c-surface)',
+                      color: 'var(--c-text-secondary)',
+                      lineHeight: 1.5, transition: 'all 0.15s',
+                      boxSizing: 'border-box',
+                    }}
+                    onMouseEnter={e => {
+                      const b = e.currentTarget as HTMLButtonElement;
+                      b.style.background = 'rgba(239,68,68,0.1)';
+                      b.style.borderColor = 'rgba(239,68,68,0.5)';
+                      b.style.color = '#f87171';
+                    }}
+                    onMouseLeave={e => {
+                      const b = e.currentTarget as HTMLButtonElement;
+                      b.style.background = 'var(--c-surface)';
+                      b.style.borderColor = 'var(--c-border-strong)';
+                      b.style.color = 'var(--c-text-secondary)';
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <Btn18
+                    type="submit"
+                    disabled={!panelForm.title.trim()}
+                    style={{ padding: '9px 20px', fontSize: 13, fontWeight: 700, textTransform: 'none', letterSpacing: 0, borderRadius: 10, display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <Plus size={13} strokeWidth={2.5} /> {panelMode === 'edit' ? 'Save Changes' : 'Add Task'}
+                  </Btn18>
+                </div>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── AI Generate Drawer ── */}
+      <AITaskPanel
+        isOpen={aiOpen}
+        onClose={() => setAiOpen(false)}
+        onAddTasks={handleAIAddTasks}
+      />
     </div>
   );
 };

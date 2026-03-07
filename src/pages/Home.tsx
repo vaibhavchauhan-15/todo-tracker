@@ -14,8 +14,9 @@ interface HomeProps { user: UserData }
 /* ─── Inner content — needs sidebar context ── */
 const HomeContent: React.FC<HomeProps> = ({ user }) => {
   const navigate = useNavigate();
-  const { activeNav } = useSidebar();
+  const { activeNav, setActiveNav } = useSidebar();
   const [triggerAdd, setTriggerAdd] = useState(false);
+  const [streak, setStreak] = useState(0);
 
   const validCategories = ['daily', 'weekly', 'monthly', 'yearly'];
   const externalCategory = validCategories.includes(activeNav)
@@ -32,6 +33,7 @@ const HomeContent: React.FC<HomeProps> = ({ user }) => {
       user={user}
       onCreateTask={() => setTriggerAdd(true)}
       onLogout={handleLogout}
+      streak={streak}
     >
       <Workspace
         user={user}
@@ -39,6 +41,8 @@ const HomeContent: React.FC<HomeProps> = ({ user }) => {
         navView={activeNav}
         triggerAdd={triggerAdd}
         onAddHandled={() => setTriggerAdd(false)}
+        onStreakChange={setStreak}
+        onViewChange={setActiveNav}
       />
     </Layout>
   );
