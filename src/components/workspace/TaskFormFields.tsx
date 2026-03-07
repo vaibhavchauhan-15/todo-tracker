@@ -9,10 +9,10 @@ import { Priority, Category } from './types';
 const inputBase: React.CSSProperties = {
   width: '100%', boxSizing: 'border-box',
   padding: '11px 14px', borderRadius: 10,
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  color: '#ede9fe', fontSize: 14, fontFamily: 'inherit',
-  outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s',
+  background: 'var(--c-input-bg)',
+  border: '1px solid var(--c-input-border)',
+  color: 'var(--c-input-text)', fontSize: 14, fontFamily: 'inherit',
+  outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s',
   letterSpacing: '0.01em',
 };
 
@@ -23,7 +23,7 @@ const textareaBase: React.CSSProperties = {
 const FL: React.FC<{ children: React.ReactNode; icon?: React.ReactNode }> = ({ children, icon }) => (
   <label style={{
     display: 'flex', alignItems: 'center', gap: 6,
-    marginBottom: 8, color: 'rgba(255,255,255,0.45)',
+    marginBottom: 8, color: 'var(--c-text-secondary)',
     fontSize: 11, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
   }}>
     {icon && <span style={{ opacity: 0.7, display: 'flex', alignItems: 'center' }}>{icon}</span>}
@@ -56,8 +56,8 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, onChange, isMobil
         style={inputBase} value={form.title} required autoFocus
         placeholder="What do you need to do?"
         onChange={e => onChange('title', e.target.value)}
-        onFocus={e => { e.target.style.borderColor = 'rgba(124,58,237,0.55)'; e.target.style.boxShadow = '0 0 0 3px rgba(124,58,237,0.1)'; e.target.style.background = 'rgba(124,58,237,0.06)'; }}
-        onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.1)'; e.target.style.boxShadow = 'none'; e.target.style.background = 'rgba(255,255,255,0.06)'; }}
+        onFocus={e => { e.target.style.borderColor = 'var(--c-input-border-focus)'; e.target.style.boxShadow = '0 0 0 3px var(--c-accent-glow-sm)'; e.target.style.background = 'var(--c-input-bg-focus)'; }}
+        onBlur={e => { e.target.style.borderColor = 'var(--c-input-border)'; e.target.style.boxShadow = 'none'; e.target.style.background = 'var(--c-input-bg)'; }}
       />
     </div>
 
@@ -68,8 +68,8 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, onChange, isMobil
         style={textareaBase} value={form.description}
         placeholder="Add details or notes (optional)"
         onChange={e => onChange('description', e.target.value)}
-        onFocus={e => { e.target.style.borderColor = 'rgba(124,58,237,0.55)'; e.target.style.boxShadow = '0 0 0 3px rgba(124,58,237,0.1)'; e.target.style.background = 'rgba(124,58,237,0.06)'; }}
-        onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.1)'; e.target.style.boxShadow = 'none'; e.target.style.background = 'rgba(255,255,255,0.06)'; }}
+        onFocus={e => { e.target.style.borderColor = 'var(--c-input-border-focus)'; e.target.style.boxShadow = '0 0 0 3px var(--c-accent-glow-sm)'; e.target.style.background = 'var(--c-input-bg-focus)'; }}
+        onBlur={e => { e.target.style.borderColor = 'var(--c-input-border)'; e.target.style.boxShadow = 'none'; e.target.style.background = 'var(--c-input-bg)'; }}
       />
     </div>
 

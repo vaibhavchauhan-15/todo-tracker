@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Box, Typography } from '@mui/material';
-import { getTheme } from './theme';
 import { supabase } from './lib/supabaseClient';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import LandingPage from './pages/LandingPage';
 
 interface UserData {
   uid: string;
@@ -36,6 +35,10 @@ const App: React.FC = () => {
           displayName: u.user_metadata?.full_name || u.user_metadata?.name || null,
           photoURL: u.user_metadata?.avatar_url || null,
         });
+        // Clean up the leftover hash fragment from OAuth redirect
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
       } else {
         setUser(null);
       }
@@ -47,37 +50,45 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{
+      <div style={{
         height: '100vh', width: '100vw',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: 'radial-gradient(ellipse at 50% 40%, rgba(0,188,212,0.07) 0%, transparent 60%), #0d0d14',
-        gap: 2,
+        background: 'var(--c-bg)',
+        gap: 16,
       }}>
-        <Box sx={{ width: 64, height: 64, mb: 1, animation: 'pulseGlow 2s ease infinite' }}>
-          <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-        </Box>
-        <Typography variant="body2" sx={{ color: '#9e9e9e', letterSpacing: '0.08em', fontSize: 13 }}>
+        <div style={{
+          width: 48, height: 48, borderRadius: 14,
+          background: 'linear-gradient(135deg, var(--c-accent), var(--c-accent-dark))',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 24px var(--c-accent-glow)',
+          animation: 'pulseGlow 2s ease infinite',
+        }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#fff" />
+          </svg>
+        </div>
+        <p style={{ color: 'var(--c-text-secondary)', letterSpacing: '0.08em', fontSize: 13, margin: 0 }}>
           Loading workspace…
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   return (
-    <ThemeProvider theme={getTheme('dark')}>
-      <CssBaseline />
+    <ThemeProvider>
       <Router>
         <Routes>
+          <Route path="/" element={user ? <Navigate to="/app" replace /> : <LandingPage />} />
           <Route 
             path="/login" 
-            element={user ? <Navigate to="/" /> : <Login onAuthStateChange={setUser} />} 
+            element={user ? <Navigate to="/app" /> : <Login onAuthStateChange={setUser} />} 
           />
           <Route 
             path="/signup" 
-            element={user ? <Navigate to="/" /> : <Signup onAuthStateChange={setUser} />} 
+            element={user ? <Navigate to="/app" /> : <Signup onAuthStateChange={setUser} />} 
           />
           <Route 
-            path="/" 
+            path="/app" 
             element={
               <ProtectedRoute user={user}>
                 <Home user={user!} />

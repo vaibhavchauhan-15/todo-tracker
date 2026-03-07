@@ -64,7 +64,7 @@ function getStrength(pw: string): { score: number; label: string; color: string 
 const s: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #faf5ff 0%, #f5f3ff 50%, #ede9fe 100%)',
+    background: 'var(--c-bg)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -78,7 +78,7 @@ const s: Record<string, React.CSSProperties> = {
     width: 350,
     height: 350,
     borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)',
+    background: 'radial-gradient(circle, var(--c-accent-glow) 0%, transparent 70%)',
     pointerEvents: 'none',
     zIndex: 0,
   },
@@ -89,17 +89,18 @@ const s: Record<string, React.CSSProperties> = {
     width: 300,
     height: 300,
     borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(109,40,217,0.08) 0%, transparent 70%)',
+    background: 'radial-gradient(circle, var(--c-accent-glow-sm) 0%, transparent 70%)',
     pointerEvents: 'none',
     zIndex: 0,
   },
   card: {
     width: '100%',
     maxWidth: 420,
-    background: '#ffffff',
+    background: 'var(--c-bg-card)',
     borderRadius: 16,
     padding: '32px',
-    boxShadow: '0 10px 25px rgba(0,0,0,0.05), 0 0 0 1px #E5E7EB',
+    boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+    border: '1px solid var(--c-border)',
     position: 'relative',
     zIndex: 1,
   },
@@ -114,23 +115,23 @@ const s: Record<string, React.CSSProperties> = {
     width: 52,
     height: 52,
     borderRadius: 14,
-    background: 'linear-gradient(135deg, #7C3AED, #6D28D9)',
+    background: 'linear-gradient(135deg, var(--c-accent), var(--c-accent-dark))',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 8px 20px rgba(124,58,237,0.35)',
+    boxShadow: '0 8px 20px var(--c-accent-glow)',
   },
   title: {
     fontSize: 28,
     fontWeight: 700,
-    color: '#111827',
+    color: 'var(--c-text-primary)',
     margin: 0,
     letterSpacing: '-0.025em',
     textAlign: 'center',
   },
   description: {
     fontSize: 14,
-    color: '#6B7280',
+    color: 'var(--c-text-secondary)',
     margin: 0,
     textAlign: 'center',
     lineHeight: 1.6,
@@ -148,10 +149,10 @@ const s: Record<string, React.CSSProperties> = {
     gap: 10,
     width: '100%',
     padding: '11px 16px',
-    border: '1px solid #E5E7EB',
+    border: '1px solid var(--c-border)',
     borderRadius: 10,
-    background: '#ffffff',
-    color: '#111827',
+    background: 'var(--c-surface)',
+    color: 'var(--c-text-primary)',
     fontSize: 14,
     fontWeight: 600,
     cursor: 'pointer',
@@ -165,16 +166,16 @@ const s: Record<string, React.CSSProperties> = {
     gap: 12,
     margin: '20px 0',
   },
-  dividerLine: { flex: 1, height: 1, background: '#E5E7EB' },
-  dividerText: { fontSize: 13, color: '#9CA3AF', fontWeight: 500 },
+  dividerLine: { flex: 1, height: 1, background: 'var(--c-border)' },
+  dividerText: { fontSize: 13, color: 'var(--c-text-secondary)', fontWeight: 500 },
   form: { display: 'flex', flexDirection: 'column', gap: 16 },
   fieldGroup: { display: 'flex', flexDirection: 'column', gap: 5 },
-  label: { fontSize: 13, fontWeight: 500, color: '#374151' },
+  label: { fontSize: 13, fontWeight: 500, color: 'var(--c-text-secondary)' },
   inputWrap: { position: 'relative', display: 'flex', alignItems: 'center' },
   inputIcon: {
     position: 'absolute',
     left: 12,
-    color: '#9CA3AF',
+    color: 'var(--c-text-secondary)',
     display: 'flex',
     alignItems: 'center',
     pointerEvents: 'none',
@@ -182,11 +183,11 @@ const s: Record<string, React.CSSProperties> = {
   input: {
     width: '100%',
     padding: '12px 14px 12px 40px',
-    border: '1px solid #E5E7EB',
+    border: '1px solid var(--c-input-border)',
     borderRadius: 10,
     fontSize: 14,
-    color: '#111827',
-    background: '#ffffff',
+    color: 'var(--c-text-primary)',
+    background: 'var(--c-input-bg)',
     outline: 'none',
     transition: 'border-color 150ms ease, box-shadow 150ms ease',
     boxSizing: 'border-box',
@@ -198,7 +199,7 @@ const s: Record<string, React.CSSProperties> = {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    color: '#9CA3AF',
+    color: 'var(--c-text-secondary)',
     display: 'flex',
     alignItems: 'center',
     padding: 2,
@@ -209,7 +210,7 @@ const s: Record<string, React.CSSProperties> = {
   primaryBtn: {
     width: '100%',
     padding: '13px 16px',
-    background: 'linear-gradient(135deg, #7C3AED, #6D28D9)',
+    background: 'linear-gradient(135deg, var(--c-accent), var(--c-accent-dark))',
     border: 'none',
     borderRadius: 10,
     color: '#ffffff',
@@ -223,17 +224,17 @@ const s: Record<string, React.CSSProperties> = {
     transition: 'all 150ms ease',
     fontFamily: 'inherit',
     outline: 'none',
-    boxShadow: '0 4px 12px rgba(124,58,237,0.3)',
+    boxShadow: '0 4px 12px var(--c-accent-glow)',
   },
   redirectText: {
     textAlign: 'center',
     fontSize: 14,
-    color: '#6B7280',
+    color: 'var(--c-text-secondary)',
     marginTop: 20,
     marginBottom: 0,
   },
   redirectLink: {
-    color: '#7C3AED',
+    color: 'var(--c-accent)',
     fontWeight: 600,
     background: 'none',
     border: 'none',
@@ -280,7 +281,7 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: 6,
     fontSize: 12,
-    color: '#6B7280',
+    color: 'var(--c-text-secondary)',
   },
 };
 
@@ -304,9 +305,9 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const getBorderAndShadow = () => {
     if (error) return { border: '1px solid #EF4444', boxShadow: focused ? '0 0 0 3px rgba(239,68,68,0.12)' : 'none' };
-    if (focused) return { border: '1px solid #7C3AED', boxShadow: '0 0 0 3px rgba(124,58,237,0.15)' };
-    if (hovered) return { border: '1px solid #7C3AED', boxShadow: 'none' };
-    return { border: '1px solid #E5E7EB', boxShadow: 'none' };
+    if (focused) return { border: '1px solid var(--c-accent)', boxShadow: '0 0 0 3px var(--c-accent-glow-sm)' };
+    if (hovered) return { border: '1px solid var(--c-accent)', boxShadow: 'none' };
+    return { border: '1px solid var(--c-input-border)', boxShadow: 'none' };
   };
 
   return (
@@ -315,7 +316,7 @@ const InputField: React.FC<InputFieldProps> = ({
         {label} <span style={{ color: '#EF4444' }}>*</span>
       </label>
       <div style={s.inputWrap}>
-        <span style={{ ...s.inputIcon, color: focused ? '#7C3AED' : '#9CA3AF' }}>
+        <span style={{ ...s.inputIcon, color: focused ? 'var(--c-accent)' : 'var(--c-text-secondary)' }}>
           {icon}
         </span>
         <input
@@ -426,7 +427,7 @@ const Signup: React.FC<SignupProps> = ({ onAuthStateChange }) => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: window.location.origin + '/app' },
       });
       if (error) throw error;
     } catch (err: any) {
@@ -502,7 +503,7 @@ const Signup: React.FC<SignupProps> = ({ onAuthStateChange }) => {
               style={{
                 ...s.socialBtn,
                 background: googleHover ? '#F9FAFB' : '#ffffff',
-                borderColor: googleHover ? '#7C3AED' : '#E5E7EB',
+                borderColor: googleHover ? 'var(--c-accent)' : '#E5E7EB',
               }}
               onClick={signInWithGoogle}
               onMouseEnter={() => setGoogleHover(true)}
@@ -600,11 +601,11 @@ const Signup: React.FC<SignupProps> = ({ onAuthStateChange }) => {
                 marginTop: 4,
                 opacity: isSubmitting ? 0.82 : 1,
                 background: submitHover && !isSubmitting
-                  ? 'linear-gradient(135deg, #6D28D9, #5B21B6)'
-                  : 'linear-gradient(135deg, #7C3AED, #6D28D9)',
+                  ? 'linear-gradient(135deg, var(--c-accent-dark), #5B21B6)'
+                  : 'linear-gradient(135deg, var(--c-accent), var(--c-accent-dark))',
                 boxShadow: submitHover && !isSubmitting
-                  ? '0 6px 20px rgba(124,58,237,0.45)'
-                  : '0 4px 12px rgba(124,58,237,0.3)',
+                  ? '0 6px 20px var(--c-accent-glow)'
+                  : '0 4px 12px var(--c-accent-glow-sm)',
               }}
               whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
               whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
@@ -638,7 +639,7 @@ const Signup: React.FC<SignupProps> = ({ onAuthStateChange }) => {
               type="button"
               style={{
                 ...s.redirectLink,
-                color: loginHover ? '#6D28D9' : '#7C3AED',
+                color: loginHover ? 'var(--c-accent-dark)' : 'var(--c-accent)',
               }}
               onMouseEnter={() => setLoginHover(true)}
               onMouseLeave={() => setLoginHover(false)}
@@ -673,15 +674,15 @@ const PasswordInputField: React.FC<PasswordInputFieldProps> = ({
 
   const getBorderAndShadow = () => {
     if (error) return { border: '1px solid #EF4444', boxShadow: focused ? '0 0 0 3px rgba(239,68,68,0.12)' : 'none' };
-    if (focused) return { border: '1px solid #7C3AED', boxShadow: '0 0 0 3px rgba(124,58,237,0.15)' };
-    if (hovered) return { border: '1px solid #7C3AED', boxShadow: 'none' };
-    return { border: '1px solid #E5E7EB', boxShadow: 'none' };
+    if (focused) return { border: '1px solid var(--c-accent)', boxShadow: '0 0 0 3px var(--c-accent-glow-sm)' };
+    if (hovered) return { border: '1px solid var(--c-accent)', boxShadow: 'none' };
+    return { border: '1px solid var(--c-input-border)', boxShadow: 'none' };
   };
 
   return (
     <>
       <div style={s.inputWrap}>
-        <span style={{ ...s.inputIcon, color: focused ? '#7C3AED' : '#9CA3AF' }}>
+        <span style={{ ...s.inputIcon, color: focused ? 'var(--c-accent)' : 'var(--c-text-secondary)' }}>
           {icon}
         </span>
         <input

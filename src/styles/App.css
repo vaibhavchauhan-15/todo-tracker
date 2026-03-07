@@ -1,5 +1,7 @@
 /* App-level styles — global styles live in index.css */
 #root {
   min-height: 100vh;
-  background-color: #0d0d14;
+  background-color: var(--c-bg);
+  color: var(--c-text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }

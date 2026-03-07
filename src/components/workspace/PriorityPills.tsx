@@ -19,9 +19,9 @@ const PriorityPills: React.FC<PriorityPillsProps> = ({ value, onChange }) => (
             display: 'flex', alignItems: 'center', gap: 6,
             padding: '7px 14px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit',
             fontSize: 12, fontWeight: 600, transition: 'all 0.15s',
-            background: active ? cfg.bg : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${active ? cfg.border : 'rgba(255,255,255,0.08)'}`,
-            color: active ? cfg.color : 'rgba(255,255,255,0.35)',
+            background: active ? cfg.bg : 'var(--c-surface)',
+            border: `1px solid ${active ? cfg.border : 'var(--c-border)'}`,
+            color: active ? cfg.color : 'var(--c-text-secondary)',
           }}
         >
           <span style={{

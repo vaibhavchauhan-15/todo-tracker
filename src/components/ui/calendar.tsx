@@ -44,8 +44,8 @@ function NavButton({ direction, onClick }: { direction: 'left' | 'right'; onClic
       style={{
         width: 28, height: 28, border: 'none', borderRadius: 8, cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: hover ? '#2d2a3e' : 'transparent',
-        color: hover ? '#ffffff' : '#8b86a8',
+        background: hover ? 'var(--c-surface-hover)' : 'transparent',
+        color: hover ? 'var(--c-text-primary)' : 'var(--c-text-secondary)',
         transition: 'all 0.15s', flexShrink: 0,
       }}
     >
@@ -58,12 +58,12 @@ function DayCell({ day, selected, today, disabled, onClick }: {
   day: number; selected: boolean; today: boolean; disabled: boolean; onClick: () => void
 }) {
   const [hover, setHover] = useState(false)
-  const bg = selected ? '#7C3AED' : (hover && !disabled ? '#2d2a3e' : 'transparent')
+  const bg = selected ? 'var(--c-accent)' : (hover && !disabled ? 'var(--c-surface-hover)' : 'transparent')
   const color = selected ? '#ffffff'
-    : disabled ? '#3d3a52'
-    : today ? '#a78bfa'
-    : hover ? '#ffffff'
-    : '#9e9ea8'
+    : disabled ? 'var(--c-text-dim)'
+    : today ? 'var(--c-accent-light)'
+    : hover ? 'var(--c-text-primary)'
+    : 'var(--c-text-secondary)'
   return (
     <button
       type="button"
@@ -73,7 +73,7 @@ function DayCell({ day, selected, today, disabled, onClick }: {
       onMouseLeave={() => setHover(false)}
       style={{
         width: 32, height: 32, borderRadius: '50%',
-        border: (!selected && today) ? '1px solid rgba(124,58,237,0.55)' : 'none',
+        border: (!selected && today) ? '1px solid var(--c-border-accent)' : 'none',
         background: bg, color,
         fontWeight: selected ? 700 : today ? 600 : 400,
         fontSize: 12, fontFamily: 'inherit',
@@ -99,7 +99,7 @@ function FooterButton({ label, onClick, hoverColor }: {
       onMouseLeave={() => setHover(false)}
       style={{
         fontSize: 12, fontFamily: 'inherit', cursor: 'pointer',
-        color: hover ? hoverColor : '#8b86a8',
+        color: hover ? hoverColor : 'var(--c-text-secondary)',
         background: hover ? `${hoverColor}18` : 'transparent',
         border: 'none', borderRadius: 6, padding: '4px 10px',
         transition: 'all 0.15s',
@@ -147,7 +147,7 @@ export function Calendar({ value, onChange, minDate }: CalendarProps) {
         padding: '16px 16px 8px',
       }}>
         <NavButton direction="left" onClick={prevMonth} />
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#ffffff' }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text-primary)' }}>
           {MONTHS[viewMonth]} {viewYear}
         </span>
         <NavButton direction="right" onClick={nextMonth} />
@@ -158,7 +158,7 @@ export function Calendar({ value, onChange, minDate }: CalendarProps) {
         {WEEKDAYS.map(d => (
           <div key={d} style={{
             textAlign: 'center', fontSize: 10, fontWeight: 600,
-            color: '#4b4664', padding: '2px 0 4px',
+            color: 'var(--c-text-dim)', padding: '2px 0 4px',
           }}>
             {d}
           </div>
@@ -186,7 +186,7 @@ export function Calendar({ value, onChange, minDate }: CalendarProps) {
       {/* Footer: Clear / Today */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '8px 16px 16px', borderTop: '1px solid #2d2a3e',
+        padding: '8px 16px 16px', borderTop: '1px solid var(--c-border)',
       }}>
         <FooterButton label="Clear" onClick={() => onChange('')} hoverColor="#ef4444" />
         <FooterButton

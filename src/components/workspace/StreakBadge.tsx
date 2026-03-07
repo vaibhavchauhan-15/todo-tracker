@@ -10,13 +10,13 @@ const StreakBadge: React.FC<{ count: number }> = ({ count }) => (
     style={{
       display: 'inline-flex', alignItems: 'center', gap: 5,
       padding: '5px 14px', borderRadius: 999,
-      background: count > 0 ? 'rgba(251,146,60,0.1)' : 'rgba(255,255,255,0.04)',
-      border: `1px solid ${count > 0 ? 'rgba(251,146,60,0.28)' : 'rgba(255,255,255,0.1)'}`,
-      color: count > 0 ? '#fb923c' : '#9e9e9e',
+      background: count > 0 ? 'rgba(251,146,60,0.1)' : 'var(--c-surface)',
+      border: `1px solid ${count > 0 ? 'rgba(251,146,60,0.28)' : 'var(--c-border)'}`,
+      color: count > 0 ? '#fb923c' : 'var(--c-text-secondary)',
       fontSize: 12, fontWeight: 700, userSelect: 'none',
     }}
   >
-    <Flame size={13} fill={count > 0 ? '#fb923c' : '#9e9e9e'} strokeWidth={0} />
+    <Flame size={13} fill={count > 0 ? '#fb923c' : 'var(--c-text-secondary)'} strokeWidth={0} />
     {count > 0 ? `${count} day streak` : 'No streak yet'}
   </motion.span>
 );

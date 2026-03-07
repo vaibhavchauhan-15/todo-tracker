@@ -28,8 +28,8 @@ function AmPmButton({ label, active, onClick }: { label: string; active: boolean
       style={{
         width: 36, height: 28, borderRadius: 6, border: 'none',
         fontSize: 11, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
-        background: active ? '#7C3AED' : (hover ? '#2d2a3e' : 'transparent'),
-        color: active ? '#ffffff' : (hover ? '#ffffff' : '#8b86a8'),
+        background: active ? 'var(--c-accent)' : (hover ? 'var(--c-surface-hover)' : 'transparent'),
+        color: active ? '#ffffff' : (hover ? 'var(--c-text-primary)' : 'var(--c-text-secondary)'),
         transition: 'all 0.15s',
       }}
     >
@@ -184,7 +184,7 @@ function ClockFace({ mode, hour12, minute, onSelect }: FaceProps) {
       onTouchMove={handleInteract}
     >
       {/* Outer ring */}
-      <circle cx={CENTER} cy={CENTER} r={CENTER - 4} fill="#1e1b2e" stroke="#2d2a3e" strokeWidth={2} />
+      <circle cx={CENTER} cy={CENTER} r={CENTER - 4} fill="var(--c-bg-card)" stroke="var(--c-border)" strokeWidth={2} />
 
       {/* Hand */}
       <line
@@ -192,18 +192,18 @@ function ClockFace({ mode, hour12, minute, onSelect }: FaceProps) {
         y1={CENTER}
         x2={hx}
         y2={hy}
-        stroke="#7C3AED"
+        stroke="var(--c-accent)"
         strokeWidth={2.5}
         strokeLinecap="round"
         style={{ transition: 'x2 0.18s ease, y2 0.18s ease' }}
       />
 
       {/* Centre dot */}
-      <circle cx={CENTER} cy={CENTER} r={4} fill="#7C3AED" />
+      <circle cx={CENTER} cy={CENTER} r={4} fill="var(--c-accent)" />
 
       {/* Dot at hand tip */}
-      <circle cx={hx} cy={hy} r={18} fill="#7C3AED" opacity={0.18} />
-      <circle cx={hx} cy={hy} r={10} fill="#7C3AED" />
+      <circle cx={hx} cy={hy} r={18} fill="var(--c-accent)" opacity={0.18} />
+      <circle cx={hx} cy={hy} r={10} fill="var(--c-accent)" />
 
       {/* Numbers */}
       {numbers.map((num, i) => {
@@ -212,7 +212,7 @@ function ClockFace({ mode, hour12, minute, onSelect }: FaceProps) {
         const isSelected = num === selected
         return (
           <g key={num}>
-            {isSelected && <circle cx={x} cy={y} r={16} fill="#7C3AED" />}
+            {isSelected && <circle cx={x} cy={y} r={16} fill="var(--c-accent)" />}
             <text
               x={x}
               y={y}
@@ -317,17 +317,17 @@ export function ClockTimePicker({ value, onChange, label, className = '' }: Cloc
         onMouseLeave={() => setTriggerHover(false)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-          padding: '10px 12px', borderRadius: 8, background: '#1e1b2e',
-          border: `1px solid ${(triggerHover || open) ? 'rgba(124,58,237,0.5)' : '#2d2a3e'}`,
+          padding: '10px 12px', borderRadius: 8, background: 'var(--c-input-bg)',
+          border: `1px solid ${(triggerHover || open) ? 'var(--c-border-accent)' : 'var(--c-input-border)'}`,
           fontSize: 14, fontFamily: 'inherit', cursor: 'pointer',
           outline: 'none', transition: 'border-color 0.2s',
         }}
       >
-        <Clock size={15} style={{ color: '#7C3AED', flexShrink: 0 }} />
+        <Clock size={15} style={{ color: 'var(--c-accent)', flexShrink: 0 }} />
         {displayTime ? (
-          <span style={{ color: '#ffffff', fontWeight: 500 }}>{displayTime}</span>
+          <span style={{ color: 'var(--c-text-primary)', fontWeight: 500 }}>{displayTime}</span>
         ) : (
-          <span style={{ color: '#8b86a8' }}>Set reminder time…</span>
+          <span style={{ color: 'var(--c-text-secondary)' }}>Set reminder time…</span>
         )}
         {displayTime && (
           <span
@@ -339,7 +339,7 @@ export function ClockTimePicker({ value, onChange, label, className = '' }: Cloc
             onMouseLeave={() => setClearHover(false)}
             style={{
               marginLeft: 'auto', fontSize: 12, cursor: 'pointer',
-              color: clearHover ? '#ffffff' : '#8b86a8',
+              color: clearHover ? 'var(--c-text-primary)' : 'var(--c-text-secondary)',
               transition: 'color 0.15s',
             }}
             aria-label="Clear time"
@@ -368,8 +368,8 @@ export function ClockTimePicker({ value, onChange, label, className = '' }: Cloc
             transition={{ type: 'spring', damping: 24, stiffness: 340 }}
             style={{
               width: 280, maxWidth: 'calc(100vw - 32px)',
-              borderRadius: 16, background: '#13111e',
-              border: '1px solid #2d2a3e',
+              borderRadius: 16, background: 'var(--c-bg-card)',
+              border: '1px solid var(--c-border)',
               boxShadow: '0 25px 60px rgba(0,0,0,0.7)',
               overflow: 'hidden',
             }}
@@ -389,12 +389,12 @@ export function ClockTimePicker({ value, onChange, label, className = '' }: Cloc
                   fontSize: 36, fontWeight: 700, letterSpacing: -0.5, background: 'transparent',
                   border: 'none', cursor: 'pointer', padding: '2px 4px', borderRadius: 4,
                   fontFamily: 'inherit', transition: 'color 0.15s',
-                  color: mode === 'hour' ? '#7C3AED' : (hourHover ? '#ffffff' : '#8b86a8'),
+                  color: mode === 'hour' ? 'var(--c-accent)' : (hourHover ? 'var(--c-text-primary)' : 'var(--c-text-secondary)'),
                 }}
               >
                 {String(hour12).padStart(2, '0')}
               </button>
-              <span style={{ fontSize: 28, fontWeight: 700, color: '#4b4664', marginBottom: 2 }}>:</span>
+              <span style={{ fontSize: 28, fontWeight: 700, color: 'var(--c-text-dim)', marginBottom: 2 }}>:</span>
               <button
                 type="button"
                 onClick={() => setMode('minute')}
@@ -404,7 +404,7 @@ export function ClockTimePicker({ value, onChange, label, className = '' }: Cloc
                   fontSize: 36, fontWeight: 700, letterSpacing: -0.5, background: 'transparent',
                   border: 'none', cursor: 'pointer', padding: '2px 4px', borderRadius: 4,
                   fontFamily: 'inherit', transition: 'color 0.15s',
-                  color: mode === 'minute' ? '#7C3AED' : (minHover ? '#ffffff' : '#8b86a8'),
+                  color: mode === 'minute' ? 'var(--c-accent)' : (minHover ? 'var(--c-text-primary)' : 'var(--c-text-secondary)'),
                 }}
               >
                 {String(minute).padStart(2, '0')}
@@ -427,7 +427,7 @@ export function ClockTimePicker({ value, onChange, label, className = '' }: Cloc
             <p style={{
               textAlign: 'center', fontSize: 10, fontWeight: 500,
               letterSpacing: '0.1em', textTransform: 'uppercase',
-              color: '#4b4664', margin: '0 0 4px',
+              color: 'var(--c-text-dim)', margin: '0 0 4px',
             }}>
               {mode === 'hour' ? 'Select Hour' : 'Select Minute'}
             </p>
@@ -464,8 +464,8 @@ export function ClockTimePicker({ value, onChange, label, className = '' }: Cloc
                 onMouseLeave={() => setClearBtnHover(false)}
                 style={{
                   fontSize: 12, fontFamily: 'inherit', cursor: 'pointer', border: 'none',
-                  color: clearBtnHover ? '#ffffff' : '#8b86a8',
-                  background: clearBtnHover ? '#2d2a3e' : 'transparent',
+                  color: clearBtnHover ? 'var(--c-text-primary)' : 'var(--c-text-secondary)',
+                  background: clearBtnHover ? 'var(--c-surface-hover)' : 'transparent',
                   borderRadius: 6, padding: '4px 8px', transition: 'all 0.15s',
                 }}
               >
@@ -478,7 +478,7 @@ export function ClockTimePicker({ value, onChange, label, className = '' }: Cloc
                 onMouseLeave={() => setDoneBtnHover(false)}
                 style={{
                   flex: 1, padding: '8px 0', borderRadius: 8, border: 'none',
-                  background: doneBtnHover ? '#6d35d4' : '#7C3AED',
+                  background: doneBtnHover ? 'var(--c-accent-dark)' : 'var(--c-accent)',
                   color: '#ffffff', fontSize: 14, fontWeight: 600,
                   fontFamily: 'inherit', cursor: 'pointer', transition: 'background 0.15s',
                 }}

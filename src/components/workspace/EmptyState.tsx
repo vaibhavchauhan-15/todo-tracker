@@ -14,15 +14,15 @@ const EmptyState: React.FC<{ category: Category }> = ({ category }) => {
     >
       <div style={{
         width: 68, height: 68, borderRadius: 18, margin: '0 auto 18px',
-        background: 'rgba(124,58,237,0.07)', border: '1px dashed rgba(124,58,237,0.25)',
+        background: 'var(--c-accent-bg)', border: '1px dashed var(--c-border-accent)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <ClipboardList size={28} color="rgba(124,58,237,0.45)" />
+        <ClipboardList size={28} color="var(--c-accent)" style={{ opacity: 0.5 }} />
       </div>
-      <p style={{ margin: '0 0 6px', color: 'rgba(255,255,255,0.55)', fontWeight: 600, fontSize: 16 }}>
+      <p style={{ margin: '0 0 6px', color: 'var(--c-text-muted)', fontWeight: 600, fontSize: 16 }}>
         No {label} tasks yet
       </p>
-      <p style={{ margin: 0, color: 'rgba(255,255,255,0.28)', fontSize: 13 }}>
+      <p style={{ margin: 0, color: 'var(--c-text-dim)', fontSize: 13 }}>
         Start by adding your first task above
       </p>
     </motion.div>

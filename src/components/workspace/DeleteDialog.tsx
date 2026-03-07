@@ -35,7 +35,7 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ onConfirm, onCancel }) => {
         exit={{ scale: 0.92,    opacity: 0 }}
         transition={{ type: 'spring', stiffness: 340, damping: 28 }}
         style={{
-          background: '#16162a', border: '1px solid rgba(255,255,255,0.1)',
+          background: 'var(--c-bg-card)', border: '1px solid var(--c-border)',
           borderRadius: 18, padding: '24px 24px 20px', maxWidth: 360, width: '100%',
           boxShadow: '0 28px 72px rgba(0,0,0,0.55)',
         }}
@@ -48,14 +48,14 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ onConfirm, onCancel }) => {
           }}>
             <Trash2 size={18} color="#ef4444" />
           </div>
-          <span style={{ color: '#f0f0f0', fontWeight: 700, fontSize: 16 }}>Delete Task?</span>
+          <span style={{ color: 'var(--c-text-primary)', fontWeight: 700, fontSize: 16 }}>Delete Task?</span>
           {/* Countdown ring */}
           <div style={{ marginLeft: 'auto', position: 'relative', width: 34, height: 34, flexShrink: 0 }}>
             <svg width="34" height="34" style={{ transform: 'rotate(-90deg)' }}>
-              <circle cx="17" cy="17" r="14" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+              <circle cx="17" cy="17" r="14" fill="none" stroke="var(--c-border)" strokeWidth="3" />
               <circle
                 cx="17" cy="17" r="14" fill="none"
-                stroke="rgba(255,255,255,0.35)" strokeWidth="3"
+                stroke="var(--c-text-secondary)" strokeWidth="3"
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 strokeDashoffset={circumference * (1 - progress)}
@@ -64,14 +64,14 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ onConfirm, onCancel }) => {
             </svg>
             <span style={{
               position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'rgba(255,255,255,0.55)', fontSize: 12, fontWeight: 800,
+              color: 'var(--c-text-muted)', fontSize: 12, fontWeight: 800,
             }}>{countdown}</span>
           </div>
         </div>
-        <p style={{ color: '#9e9e9e', fontSize: 13, margin: '0 0 6px', lineHeight: 1.6 }}>
+        <p style={{ color: 'var(--c-text-secondary)', fontSize: 13, margin: '0 0 6px', lineHeight: 1.6 }}>
           Are you sure you want to delete this task? This action cannot be undone.
         </p>
-        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, margin: '0 0 20px' }}>
+        <p style={{ color: 'var(--c-text-dim)', fontSize: 12, margin: '0 0 20px' }}>
           Closing automatically in {countdown}s…
         </p>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
@@ -79,8 +79,8 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ onConfirm, onCancel }) => {
             onClick={onCancel}
             style={{
               padding: '8px 18px', borderRadius: 9, cursor: 'pointer', fontFamily: 'inherit',
-              border: '1px solid rgba(255,255,255,0.12)', background: 'transparent',
-              color: '#9e9e9e', fontSize: 13, fontWeight: 600,
+              border: '1px solid var(--c-border-strong)', background: 'transparent',
+              color: 'var(--c-text-secondary)', fontSize: 13, fontWeight: 600,
             }}
           >Cancel</button>
           <button

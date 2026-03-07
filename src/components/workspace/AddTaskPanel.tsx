@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, X, ChevronDown } from 'lucide-react';
+import GlowButton from '../ui/GlowButton';
 import TaskFormFields, { TaskFormData } from './TaskFormFields';
 import { useIsMobile } from './useIsMobile';
 
@@ -24,17 +25,17 @@ const AddTaskPanel: React.FC<AddTaskPanelProps> = ({
     <div style={{
       borderRadius: 14,
       border: `1px solid ${
-        isOpen          ? 'rgba(124,58,237,0.45)'
-        : triggerHover  ? 'rgba(124,58,237,0.4)'
-        : 'rgba(255,255,255,0.08)'
+        isOpen          ? 'var(--c-border-accent)'
+        : triggerHover  ? 'var(--c-border-accent)'
+        : 'var(--c-border)'
       }`,
       background: isOpen
-        ? 'rgba(10,9,18,0.92)'
-        : triggerHover ? 'rgba(124,58,237,0.04)' : 'transparent',
+        ? 'var(--c-bg-card)'
+        : triggerHover ? 'var(--c-accent-bg)' : 'var(--c-surface)',
       transition: 'border-color 0.2s, background 0.25s, box-shadow 0.25s',
       boxShadow: isOpen
-        ? '0 8px 40px rgba(0,0,0,0.4), 0 0 0 3px rgba(124,58,237,0.08)'
-        : triggerHover ? '0 2px 16px rgba(0,0,0,0.25)' : 'none',
+        ? '0 8px 40px rgba(0,0,0,0.18), 0 0 0 3px var(--c-accent-glow-sm)'
+        : triggerHover ? '0 2px 16px rgba(0,0,0,0.1)' : 'none',
       overflow: 'hidden',
     }}>
 
@@ -51,15 +52,15 @@ const AddTaskPanel: React.FC<AddTaskPanelProps> = ({
       >
         <span style={{
           display: 'flex', alignItems: 'center', gap: 10,
-          color: isOpen ? '#c4b5fd' : triggerHover ? '#a78bfa' : 'rgba(255,255,255,0.45)',
+          color: isOpen ? 'var(--c-accent)' : triggerHover ? 'var(--c-accent)' : 'var(--c-text-secondary)',
           fontSize: 14, fontWeight: 600, transition: 'color 0.2s', letterSpacing: '0.01em',
         }}>
           <span style={{
             width: 28, height: 28, borderRadius: 8, flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: isOpen
-              ? 'rgba(124,58,237,0.25)'
-              : triggerHover ? 'rgba(124,58,237,0.18)' : 'rgba(255,255,255,0.07)',
+              ? 'var(--c-accent-bg-hover)'
+              : triggerHover ? 'var(--c-accent-bg)' : 'var(--c-surface)',
             transition: 'background 0.2s',
           }}>
             <Plus size={14} color={isOpen ? '#c4b5fd' : triggerHover ? '#a78bfa' : 'rgba(255,255,255,0.55)'} strokeWidth={2.5} />
@@ -82,7 +83,7 @@ const AddTaskPanel: React.FC<AddTaskPanelProps> = ({
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             style={{ overflow: 'hidden' }}
           >
-            <div style={{ height: 1, background: 'rgba(124,58,237,0.22)', margin: '0 20px' }} />
+            <div style={{ height: 1, background: 'var(--c-border-accent)', margin: '0 20px' }} />
 
             <form onSubmit={onSubmit} style={{ padding: '20px 20px 22px', display: 'flex', flexDirection: 'column', gap: 18 }}>
               <TaskFormFields form={form} onChange={onChange} isMobile={isMobile} minDate={today} />
@@ -114,25 +115,13 @@ const AddTaskPanel: React.FC<AddTaskPanelProps> = ({
                 >
                   Cancel
                 </button>
-                <button
+                <GlowButton
                   type="submit"
                   disabled={!form.title.trim()}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 7,
-                    padding: '10px 24px', borderRadius: 10, fontFamily: 'inherit', border: 'none',
-                    background: !form.title.trim() ? 'rgba(124,58,237,0.35)' : 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
-                    color: !form.title.trim() ? 'rgba(255,255,255,0.4)' : '#fff',
-                    fontSize: 13, fontWeight: 700,
-                    cursor: !form.title.trim() ? 'not-allowed' : 'pointer',
-                    transition: 'box-shadow 0.2s, transform 0.15s',
-                    boxShadow: !form.title.trim() ? 'none' : '0 2px 14px rgba(124,58,237,0.45)',
-                    letterSpacing: '0.01em',
-                  }}
-                  onMouseEnter={e => { if (form.title.trim()) { const b = e.currentTarget as HTMLButtonElement; b.style.boxShadow = '0 4px 22px rgba(124,58,237,0.6)'; b.style.transform = 'translateY(-1px)'; } }}
-                  onMouseLeave={e => { const b = e.currentTarget as HTMLButtonElement; b.style.boxShadow = '0 2px 14px rgba(124,58,237,0.45)'; b.style.transform = 'none'; }}
+                  style={{ fontSize: 13 }}
                 >
                   <Plus size={13} strokeWidth={2.5} /> Add Task
-                </button>
+                </GlowButton>
               </div>
             </form>
           </motion.div>

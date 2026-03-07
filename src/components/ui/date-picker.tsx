@@ -43,17 +43,17 @@ export function DatePicker({
         onMouseLeave={() => setTriggerHover(false)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-          padding: '10px 12px', borderRadius: 8, background: '#1e1b2e',
-          border: `1px solid ${(triggerHover || open) ? 'rgba(124,58,237,0.5)' : '#2d2a3e'}`,
+          padding: '10px 12px', borderRadius: 8, background: 'var(--c-input-bg)',
+          border: `1px solid ${(triggerHover || open) ? 'var(--c-border-accent)' : 'var(--c-input-border)'}`,
           fontSize: 14, fontFamily: 'inherit', cursor: 'pointer',
           outline: 'none', transition: 'border-color 0.2s',
         }}
       >
-        <CalendarIcon size={15} style={{ color: '#7C3AED', flexShrink: 0 }} />
+        <CalendarIcon size={15} style={{ color: 'var(--c-accent)', flexShrink: 0 }} />
         {value ? (
-          <span style={{ color: '#ffffff', fontWeight: 500 }}>{formatDateDisplay(value)}</span>
+          <span style={{ color: 'var(--c-text-primary)', fontWeight: 500 }}>{formatDateDisplay(value)}</span>
         ) : (
-          <span style={{ color: '#8b86a8' }}>{placeholder}</span>
+          <span style={{ color: 'var(--c-text-secondary)' }}>{placeholder}</span>
         )}
         {value && (
           <span
@@ -65,7 +65,7 @@ export function DatePicker({
             onMouseLeave={() => setClearHover(false)}
             style={{
               marginLeft: 'auto', fontSize: 12, cursor: 'pointer',
-              color: clearHover ? '#ffffff' : '#8b86a8',
+              color: clearHover ? 'var(--c-text-primary)' : 'var(--c-text-secondary)',
               transition: 'color 0.15s',
             }}
             aria-label="Clear date"
@@ -94,8 +94,8 @@ export function DatePicker({
               transition={{ type: 'spring', damping: 24, stiffness: 340 }}
               style={{
                 width: 280, maxWidth: 'calc(100vw - 32px)',
-                borderRadius: 16, background: '#13111e',
-                border: '1px solid #2d2a3e',
+                borderRadius: 16, background: 'var(--c-bg-card)',
+                border: '1px solid var(--c-border)',
                 boxShadow: '0 25px 60px rgba(0,0,0,0.7)',
                 overflow: 'hidden',
               }}

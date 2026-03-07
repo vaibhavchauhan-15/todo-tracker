@@ -30,11 +30,11 @@ const fieldSx = {
     color: '#f0f0f0',
     background: 'rgba(255,255,255,0.04)',
     '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-    '&:hover fieldset': { borderColor: 'rgba(0,188,212,0.5)' },
-    '&.Mui-focused fieldset': { borderColor: '#00bcd4' },
+    '&:hover fieldset': { borderColor: 'rgba(99,102,241,0.5)' },
+    '&.Mui-focused fieldset': { borderColor: '#6366F1' },
   },
   '& .MuiInputLabel-root': { color: '#9e9e9e' },
-  '& .MuiInputLabel-root.Mui-focused': { color: '#00bcd4' },
+  '& .MuiInputLabel-root.Mui-focused': { color: '#6366F1' },
 };
 
 const Profile: React.FC<ProfileProps> = ({ user, onBack }) => {
@@ -84,7 +84,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onBack }) => {
       {/* ── Navbar ── */}
       <AppBar position="static" elevation={0} sx={{ background: 'rgba(13,13,20,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
         <Toolbar>
-          <IconButton edge="start" onClick={onBack} sx={{ mr: 2, color: '#9e9e9e', '&:hover': { color: '#00bcd4' } }}>
+          <IconButton edge="start" onClick={onBack} sx={{ mr: 2, color: '#9e9e9e', '&:hover': { color: '#6366F1' } }}>
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6" sx={{ fontWeight: 700, color: '#f0f0f0' }}>Profile</Typography>
@@ -99,7 +99,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onBack }) => {
               <Avatar
                 src={user.photoURL || undefined}
                 alt={user.displayName || 'User'}
-                sx={{ width: 100, height: 100, border: '3px solid rgba(0,188,212,0.4)', boxShadow: '0 0 20px rgba(0,188,212,0.2)' }}
+                sx={{ width: 100, height: 100, border: '3px solid rgba(99,102,241,0.4)', boxShadow: '0 0 20px rgba(99,102,241,0.2)' }}
               />
             </Box>
             <Box sx={{ textAlign: 'center' }}>
@@ -115,7 +115,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onBack }) => {
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2.5 }}>
             <Typography variant="subtitle1" sx={{ color: '#f0f0f0', fontWeight: 600 }}>User Information</Typography>
             {!isEditing && (
-              <IconButton size="small" onClick={() => setIsEditing(true)} sx={{ color: '#9e9e9e', '&:hover': { color: '#00bcd4' } }}>
+              <IconButton size="small" onClick={() => setIsEditing(true)} sx={{ color: '#9e9e9e', '&:hover': { color: '#6366F1' } }}>
                 <EditIcon fontSize="small" />
               </IconButton>
             )}
@@ -149,7 +149,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onBack }) => {
           <Typography variant="subtitle1" sx={{ color: '#f0f0f0', fontWeight: 600, mb: 2.5 }}>Account Actions</Typography>
           <Stack spacing={1.5}>
             <Button variant="outlined" startIcon={<LockIcon />} onClick={() => setShowPasswordDialog(true)}
-              sx={{ justifyContent: 'flex-start', borderRadius: 2, borderColor: 'rgba(255,255,255,0.1)', color: '#c0c0c0', '&:hover': { borderColor: '#00bcd4', color: '#00bcd4', background: 'rgba(0,188,212,0.06)' } }}>
+              sx={{ justifyContent: 'flex-start', borderRadius: 2, borderColor: 'rgba(255,255,255,0.1)', color: '#c0c0c0', '&:hover': { borderColor: '#6366F1', color: '#6366F1', background: 'rgba(99,102,241,0.06)' } }}>
               Change Password
             </Button>
             <Button variant="outlined" startIcon={<LogoutIcon />} onClick={() => supabase.auth.signOut()}

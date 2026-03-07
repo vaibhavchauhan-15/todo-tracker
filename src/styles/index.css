@@ -1,27 +1,144 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+/* ═══════════════════════════════════════════════════════════
+   DESIGN TOKENS — Dark theme (default, matches landing page)
+   ═══════════════════════════════════════════════════════════ */
 :root {
-  --bg-primary: #0d0d14;
-  --bg-surface: rgba(255, 255, 255, 0.04);
-  --bg-surface-hover: rgba(255, 255, 255, 0.07);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(0, 188, 212, 0.4);
-  --accent: #00bcd4;
-  --accent-glow: rgba(0, 188, 212, 0.2);
-  --text-primary: #f0f0f0;
-  --text-secondary: #9e9e9e;
-  --priority-high: #f44336;
-  --priority-medium: #ff9800;
-  --priority-low: #4caf50;
+  /* Backgrounds */
+  --c-bg:           #0B0F19;
+  --c-bg-card:      #111827;
+  --c-bg-darker:    #080C14;
+  --c-bg-section:   #0D1220;
+
+  /* Accent (indigo — matches landing page) */
+  --c-accent:          #6366F1;
+  --c-accent-dark:     #4F46E5;
+  --c-accent-light:    #818CF8;
+  --c-accent-glow:     rgba(99, 102, 241, 0.25);
+  --c-accent-glow-sm:  rgba(99, 102, 241, 0.12);
+  --c-accent-bg:       rgba(99, 102, 241, 0.10);
+  --c-accent-bg-hover: rgba(99, 102, 241, 0.18);
+
+  /* Success / green */
+  --c-green:      #22C55E;
+  --c-green-glow: rgba(34, 197, 94, 0.2);
+
+  /* Typography */
+  --c-text-primary:   #FFFFFF;
+  --c-text-secondary: #9CA3AF;
+  --c-text-dim:       rgba(255, 255, 255, 0.38);
+  --c-text-muted:     rgba(255, 255, 255, 0.55);
+
+  /* Borders */
+  --c-border:        rgba(255, 255, 255, 0.08);
+  --c-border-strong: rgba(255, 255, 255, 0.14);
+  --c-border-accent: rgba(99, 102, 241, 0.50);
+
+  /* Surfaces */
+  --c-surface:       rgba(255, 255, 255, 0.04);
+  --c-surface-hover: rgba(255, 255, 255, 0.08);
+
+  /* Sidebar */
+  --c-sidebar-bg:   linear-gradient(180deg, #13101e 0%, #0d0b16 100%);
+  --c-sidebar-text: rgba(255, 255, 255, 0.55);
+  --c-sidebar-divider: rgba(255, 255, 255, 0.06);
+
+  /* Form inputs */
+  --c-input-bg:         rgba(255, 255, 255, 0.06);
+  --c-input-bg-focus:   rgba(99, 102, 241, 0.06);
+  --c-input-border:     rgba(255, 255, 255, 0.10);
+  --c-input-border-focus: rgba(99, 102, 241, 0.55);
+  --c-input-text:       #ede9fe;
+  --c-input-placeholder: rgba(255, 255, 255, 0.28);
+
+  /* Scrollbar */
+  --c-scrollbar:       rgba(255, 255, 255, 0.10);
+  --c-scrollbar-hover: rgba(99, 102, 241, 0.50);
+
+  /* Priority colours */
+  --c-priority-high:   #ef4444;
+  --c-priority-medium: #f59e0b;
+  --c-priority-low:    #22c55e;
+  --c-priority-urgent: #a855f7;
+
+  color-scheme: dark;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   DESIGN TOKENS — Light theme
+   ═══════════════════════════════════════════════════════════ */
+[data-theme='light'] {
+  /* Backgrounds */
+  --c-bg:           #F5F7FF;
+  --c-bg-card:      #FFFFFF;
+  --c-bg-darker:    #EEF1F8;
+  --c-bg-section:   #F0F4FF;
+
+  /* Accent (same indigo) */
+  --c-accent:          #6366F1;
+  --c-accent-dark:     #4F46E5;
+  --c-accent-light:    #6366F1;
+  --c-accent-glow:     rgba(99, 102, 241, 0.15);
+  --c-accent-glow-sm:  rgba(99, 102, 241, 0.08);
+  --c-accent-bg:       rgba(99, 102, 241, 0.08);
+  --c-accent-bg-hover: rgba(99, 102, 241, 0.14);
+
+  /* Success / green */
+  --c-green:      #16A34A;
+  --c-green-glow: rgba(22, 163, 74, 0.15);
+
+  /* Typography */
+  --c-text-primary:   #111827;
+  --c-text-secondary: #6B7280;
+  --c-text-dim:       rgba(0, 0, 0, 0.40);
+  --c-text-muted:     rgba(0, 0, 0, 0.55);
+
+  /* Borders */
+  --c-border:        rgba(0, 0, 0, 0.08);
+  --c-border-strong: rgba(0, 0, 0, 0.14);
+  --c-border-accent: rgba(99, 102, 241, 0.40);
+
+  /* Surfaces */
+  --c-surface:       rgba(0, 0, 0, 0.03);
+  --c-surface-hover: rgba(0, 0, 0, 0.07);
+
+  /* Sidebar */
+  --c-sidebar-bg:   linear-gradient(180deg, #F0F4FF 0%, #E8EEFF 100%);
+  --c-sidebar-text: rgba(0, 0, 0, 0.55);
+  --c-sidebar-divider: rgba(0, 0, 0, 0.08);
+
+  /* Form inputs */
+  --c-input-bg:           rgba(0, 0, 0, 0.04);
+  --c-input-bg-focus:     rgba(99, 102, 241, 0.05);
+  --c-input-border:       rgba(0, 0, 0, 0.12);
+  --c-input-border-focus: rgba(99, 102, 241, 0.50);
+  --c-input-text:         #1e1b4b;
+  --c-input-placeholder:  rgba(0, 0, 0, 0.35);
+
+  /* Scrollbar */
+  --c-scrollbar:       rgba(0, 0, 0, 0.15);
+  --c-scrollbar-hover: rgba(99, 102, 241, 0.40);
+
+  /* Priority colours (slightly more saturated for light bg) */
+  --c-priority-high:   #dc2626;
+  --c-priority-medium: #d97706;
+  --c-priority-low:    #16a34a;
+  --c-priority-urgent: #9333ea;
+
+  color-scheme: light;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BASE RESET
+   ═══════════════════════════════════════════════════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
 html, body {
   height: 100%;
-  background-color: var(--bg-primary);
+  background-color: var(--c-bg);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 body {
@@ -30,66 +147,95 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--text-primary);
+  color: var(--c-text-primary);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* ── Custom Scrollbar ── */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
-}
+/* ═══════════════════════════════════════════════════════════
+   CUSTOM SCROLLBAR
+   ═══════════════════════════════════════════════════════════ */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--c-scrollbar);
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 188, 212, 0.5);
+::-webkit-scrollbar-thumb:hover { background: var(--c-scrollbar-hover); }
+
+/* ═══════════════════════════════════════════════════════════
+   FORM ELEMENT PLACEHOLDERS
+   ═══════════════════════════════════════════════════════════ */
+input::placeholder, textarea::placeholder {
+  color: var(--c-input-placeholder);
 }
 
-/* ── Global Keyframes ── */
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL KEYFRAMES
+   ═══════════════════════════════════════════════════════════ */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
 @keyframes slideInLeft {
   from { opacity: 0; transform: translateX(-20px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.93); }
   to   { opacity: 1; transform: scale(1); }
 }
-
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 10px rgba(0, 188, 212, 0.25); }
-  50%       { box-shadow: 0 0 22px rgba(0, 188, 212, 0.55); }
+  0%, 100% { box-shadow: 0 0 10px var(--c-accent-glow); }
+  50%       { box-shadow: 0 0 22px var(--c-accent-glow); }
 }
-
 @keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
-
 @keyframes shimmer {
   0%   { background-position: -200% center; }
   100% { background-position:  200% center; }
 }
 
 /* ── Utility Animation Classes ── */
-.anim-fadeInUp  { animation: fadeInUp  0.45s ease forwards; }
-.anim-scaleIn   { animation: scaleIn   0.4s  ease forwards; }
-.anim-fadeIn    { animation: fadeIn    0.35s ease forwards; }
+.anim-fadeInUp { animation: fadeInUp 0.45s ease forwards; }
+.anim-scaleIn  { animation: scaleIn  0.4s  ease forwards; }
+.anim-fadeIn   { animation: fadeIn   0.35s ease forwards; }
+
+/* ═══════════════════════════════════════════════════════════
+   INTERACTIVE HOVER HELPERS (theme-aware via CSS vars)
+   ═══════════════════════════════════════════════════════════ */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.18s, background 0.18s, color 0.18s;
+}
+.btn-ghost:hover {
+  background: var(--c-surface-hover);
+  border-color: var(--c-border-strong);
+  color: var(--c-text-primary);
+}
+.btn-accent {
+  background: var(--c-accent-bg);
+  border: 1px solid var(--c-border-accent);
+  color: var(--c-accent-light);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.18s, box-shadow 0.18s, border-color 0.18s;
+}
+.btn-accent:hover {
+  background: var(--c-accent-bg-hover);
+  box-shadow: 0 0 0 3px var(--c-accent-glow-sm);
+}

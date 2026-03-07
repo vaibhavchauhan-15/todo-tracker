@@ -10,12 +10,18 @@ import TaskCard from './workspace/TaskCard';
 import AddTaskPanel from './workspace/AddTaskPanel';
 import { TaskFormData } from './workspace/TaskFormFields';
 
-interface WorkspaceProps { user: any }
+interface WorkspaceProps {
+  user: any;
+  externalCategory?: Category;
+  navView?: string;
+  triggerAdd?: boolean;
+  onAddHandled?: () => void;
+}
 
-const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
+const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, triggerAdd, onAddHandled }) => {
   const [tasks, setTasks]               = useState<Task[]>([]);
   const [loading, setLoading]           = useState(true);
-  const [activeCategory, setCategory]   = useState<Category>('daily');
+  const [activeCategory, setCategory]   = useState<Category>(externalCategory ?? 'daily');
   const [addOpen, setAddOpen]           = useState(false);
   const [deleteId, setDeleteId]         = useState<string | null>(null);
   const [editingId, setEditingId]       = useState<string | null>(null);
@@ -56,6 +62,40 @@ const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tasks]);
+
+  /* ── Sync external category / view from sidebar ── */
+  useEffect(() => {
+    if (navView === 'all' || navView === 'completed') {
+      setAddOpen(false);
+      setEditingId(null);
+    } else if (externalCategory && externalCategory !== activeCategory) {
+      setCategory(externalCategory);
+      setAddOpen(false);
+      setEditingId(null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [externalCategory, navView]);
+
+  /* ── Handle sidebar "Create Task" trigger ── */
+  useEffect(() => {
+    if (triggerAdd) {
+      setAddOpen(true);
+      onAddHandled?.();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggerAdd]);
+
+  /* ── Keyboard shortcut: "N" to open add panel ── */
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (e.key === 'n' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+        setAddOpen(o => !o);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
 
   /* ── Add form ── */
   const [addForm, setAddForm] = useState<TaskFormData>({
@@ -227,7 +267,11 @@ const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
   };
 
   /* ── Derived data ── */
-  const filtered  = tasks.filter(t => (t.category ?? 'daily') === activeCategory);
+  const filtered = navView === 'all'
+    ? tasks
+    : navView === 'completed'
+    ? tasks.filter(t => t.status === 'completed')
+    : tasks.filter(t => (t.category ?? 'daily') === activeCategory);
   const pending   = filtered.filter(t => t.status === 'pending').length;
   const done      = filtered.filter(t => t.status === 'completed').length;
   const total     = filtered.length;
@@ -244,10 +288,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <h1 style={{ margin: 0, color: '#f0f0f0', fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em' }}>
-              My Workspace
+            <h1 style={{ margin: 0, color: 'var(--c-text-primary)', fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em' }}>
+              {navView === 'all' ? 'All Tasks' : navView === 'completed' ? 'Completed Tasks' : 'My Workspace'}
             </h1>
-            <p style={{ margin: '4px 0 0', color: '#9e9e9e', fontSize: 14 }}>
+            <p style={{ margin: '4px 0 0', color: 'var(--c-text-secondary)', fontSize: 14 }}>
               {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
             </p>
           </div>
@@ -256,17 +300,17 @@ const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
         </div>
       </motion.div>
 
-      {/* ── Category Tabs ── */}
+      {/* ── Category Tabs — hidden on 'all' and 'completed' views ── */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.06 }}
-        style={{ marginBottom: 24 }}
+        style={{ marginBottom: 24, display: navView === 'all' || navView === 'completed' ? 'none' : undefined }}
       >
         <div style={{
           display: 'flex', gap: 2, padding: '4px',
-          background: 'rgba(255,255,255,0.03)', borderRadius: 14,
-          border: '1px solid rgba(255,255,255,0.07)',
+          background: 'var(--c-surface)', borderRadius: 14,
+          border: '1px solid var(--c-border)',
           width: isMobile ? '100%' : 'fit-content',
           overflowX: isMobile ? 'auto' : 'visible',
           position: 'relative',
@@ -285,12 +329,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
                   border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                   fontSize: 13, fontWeight: 700,
                   background: 'transparent',
-                  color: active ? '#fff' : '#6B7280',
+                  color: active ? '#fff' : 'var(--c-text-secondary)',
                   transition: 'color 0.2s ease',
                   zIndex: 1, outline: 'none',
                 }}
-                onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = '#7C3AED'; } }}
-                onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = '#6B7280'; } }}
+                onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-accent)'; } }}
+                onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-secondary)'; } }}
               >
                 {/* Sliding pill background */}
                 {active && (
@@ -299,8 +343,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
                     transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                     style={{
                       position: 'absolute', inset: 0, borderRadius: 10,
-                      background: '#7C3AED', zIndex: -1,
-                      boxShadow: '0 2px 12px rgba(124,58,237,0.35)',
+                      background: 'var(--c-accent)', zIndex: -1,
+                      boxShadow: '0 2px 12px var(--c-accent-glow)',
                     }}
                   />
                 )}
@@ -319,9 +363,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
         style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 14, marginBottom: 24 }}
       >
         {[
-          { label: 'Total',   value: total,   color: '#7C3AED', bg: 'rgba(124,58,237,0.08)',   border: 'rgba(124,58,237,0.18)'  },
+          { label: 'Total',   value: total,   color: 'var(--c-accent)',  bg: 'var(--c-accent-bg)',       border: 'var(--c-border-accent)'  },
           { label: 'Pending', value: pending,  color: '#f59e0b', bg: 'rgba(245,158,11,0.08)',   border: 'rgba(245,158,11,0.18)'  },
-          { label: 'Done',    value: done,     color: '#22c55e', bg: 'rgba(34,197,94,0.08)',    border: 'rgba(34,197,94,0.18)'   },
+          { label: 'Done',    value: done,     color: 'var(--c-green)', bg: 'var(--c-green-glow)',    border: 'rgba(34,197,94,0.22)'   },
         ].map((s, i) => (
           <motion.div
             key={s.label}
@@ -334,7 +378,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
             }}
           >
             <div style={{ color: s.color, fontWeight: 800, fontSize: 28, lineHeight: 1 }}>{s.value}</div>
-            <div style={{ color: '#9e9e9e', fontSize: 11, fontWeight: 600, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
+            <div style={{ color: 'var(--c-text-secondary)', fontSize: 11, fontWeight: 600, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
           </motion.div>
         ))}
       </motion.div>
@@ -358,7 +402,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user }) => {
 
       {/* ── Task List ── */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px 0', color: '#9e9e9e', fontSize: 14 }}>
+        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--c-text-secondary)', fontSize: 14 }}>
           Loading tasks…
         </div>
       ) : (
