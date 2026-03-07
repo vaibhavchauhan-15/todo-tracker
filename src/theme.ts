@@ -18,11 +18,11 @@ const getThemeOptions = (mode: 'light' | 'dark'): ThemeOptions => ({
     error:   { main: '#f44336' },
     background: {
       default: mode === 'dark' ? '#0d0d14' : '#f5f5f5',
-      paper:   mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(255, 255, 255, 0.95)',
+      paper:   mode === 'dark' ? 'rgba(255, 255, 255, 0.07)' : 'rgba(255, 255, 255, 0.95)',
     },
     text: {
       primary:   mode === 'dark' ? '#f0f0f0' : '#1a1a1a',
-      secondary: mode === 'dark' ? '#9e9e9e' : '#666666',
+      secondary: mode === 'dark' ? '#b4bac6' : '#666666',
     },
   },
   components: {
@@ -30,9 +30,9 @@ const getThemeOptions = (mode: 'light' | 'dark'): ThemeOptions => ({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(255, 255, 255, 0.97)',
+          backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.07)' : 'rgba(255, 255, 255, 0.97)',
           backdropFilter: 'blur(12px)',
-          border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`,
+          border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.14)' : 'rgba(0, 0, 0, 0.08)'}`,
           transition: 'all 0.25s ease',
         },
       },
@@ -60,7 +60,7 @@ const getThemeOptions = (mode: 'light' | 'dark'): ThemeOptions => ({
           },
         },
         outlined: {
-          borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.2)',
+          borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.28)' : 'rgba(0, 0, 0, 0.2)',
           '&:hover': {
             borderColor: '#00bcd4',
             backgroundColor: 'rgba(0, 188, 212, 0.08)',
@@ -75,7 +75,7 @@ const getThemeOptions = (mode: 'light' | 'dark'): ThemeOptions => ({
           '& .MuiOutlinedInput-root': {
             transition: 'all 0.3s ease-in-out',
             '& fieldset': {
-              borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+              borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.30)' : 'rgba(0, 0, 0, 0.2)',
               transition: 'all 0.3s ease-in-out',
             },
             '&:hover fieldset': {

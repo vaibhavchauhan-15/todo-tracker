@@ -108,9 +108,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 4,
                   padding: '2px 9px', borderRadius: 999, fontSize: 11, fontWeight: 700,
-                  color: (task.streak ?? 0) > 0 ? '#fb923c' : '#9e9e9e',
-                  background: (task.streak ?? 0) > 0 ? 'rgba(251,146,60,0.1)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${(task.streak ?? 0) > 0 ? 'rgba(251,146,60,0.28)' : 'rgba(255,255,255,0.1)'}`,
+                  color: (task.streak ?? 0) > 0 ? '#fb923c' : 'var(--c-text-secondary)',
+                  background: (task.streak ?? 0) > 0 ? 'rgba(251,146,60,0.14)' : 'var(--c-surface)',
+                  border: `1px solid ${(task.streak ?? 0) > 0 ? 'rgba(251,146,60,0.38)' : 'var(--c-border)'}`,
                   userSelect: 'none',
                 }}>
                   <Flame size={10} fill={(task.streak ?? 0) > 0 ? '#fb923c' : '#9e9e9e'} strokeWidth={0} />
@@ -131,11 +131,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
               style={{
                 border: 'none', background: 'transparent', cursor: isDone ? 'not-allowed' : 'pointer',
                 padding: 8, borderRadius: 8, display: 'flex', alignItems: 'center',
-                color: 'var(--c-text-dim)', transition: 'color 0.15s, background 0.15s',
+                color: 'var(--c-text-secondary)', transition: 'color 0.15s, background 0.15s',
                 opacity: isDone ? 0.4 : 1,
               }}
               onMouseEnter={e => { if (!isDone) { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-accent)'; (e.currentTarget as HTMLButtonElement).style.background = 'var(--c-accent-bg)'; } }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-dim)'; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-secondary)'; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
             >
               <Pencil size={15} />
             </motion.button>
@@ -148,10 +148,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
               style={{
                 border: 'none', background: 'transparent', cursor: 'pointer',
                 padding: 8, borderRadius: 8, display: 'flex', alignItems: 'center',
-                color: 'var(--c-text-dim)', transition: 'color 0.15s, background 0.15s',
+                color: 'var(--c-text-secondary)', transition: 'color 0.15s, background 0.15s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#ef4444'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.08)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-dim)'; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#ef4444'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.12)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-secondary)'; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
             >
               <Trash2 size={15} />
             </motion.button>

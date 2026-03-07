@@ -31,8 +31,8 @@ export const CATEGORIES: { key: Category; label: string }[] = [
 ];
 
 export const PRIORITY_CFG: Record<Priority, { color: string; bg: string; border: string; label: string }> = {
-  high:   { color: '#ef4444', bg: 'rgba(239,68,68,0.12)',   border: 'rgba(239,68,68,0.3)',   label: 'High'   },
-  medium: { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.3)',  label: 'Medium' },
-  low:    { color: '#22c55e', bg: 'rgba(34,197,94,0.12)',   border: 'rgba(34,197,94,0.3)',   label: 'Low'    },
-  urgent: { color: '#a855f7', bg: 'rgba(168,85,247,0.12)',  border: 'rgba(168,85,247,0.3)',  label: 'Urgent' },
+  high:   { color: '#ef4444', bg: 'rgba(239,68,68,0.18)',   border: 'rgba(239,68,68,0.48)',   label: 'High'   },
+  medium: { color: '#f59e0b', bg: 'rgba(245,158,11,0.18)',  border: 'rgba(245,158,11,0.48)',  label: 'Medium' },
+  low:    { color: '#22c55e', bg: 'rgba(34,197,94,0.18)',   border: 'rgba(34,197,94,0.48)',   label: 'Low'    },
+  urgent: { color: '#a855f7', bg: 'rgba(168,85,247,0.18)',  border: 'rgba(168,85,247,0.48)',  label: 'Urgent' },
 };

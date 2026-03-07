@@ -451,8 +451,8 @@ const AITaskPanel: React.FC<AITaskPanelProps> = ({ isOpen, onClose, onAddTasks }
                 <span style={{
                   width: 30, height: 30, borderRadius: 8,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'linear-gradient(135deg, rgba(196,181,253,0.2), rgba(56,189,248,0.15))',
-                  border: '1px solid rgba(196,181,253,0.25)',
+                  background: 'linear-gradient(135deg, rgba(196,181,253,0.22), rgba(56,189,248,0.18))',
+                  border: '1px solid rgba(196,181,253,0.38)',
                 }}>
                   <Sparkles size={14} color="#c4b5fd" strokeWidth={2} />
                 </span>
@@ -463,19 +463,19 @@ const AITaskPanel: React.FC<AITaskPanelProps> = ({ isOpen, onClose, onAddTasks }
                 onClick={handleClose}
                 style={{
                   width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  background: 'rgba(255,255,255,0.04)',
-                  color: 'rgba(255,255,255,0.5)',
+                  border: '1px solid var(--c-border-strong)',
+                  background: 'var(--c-surface)',
+                  color: 'var(--c-text-secondary)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all 0.15s',
                 }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)';
-                  (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.85)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--c-accent)';
+                  (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-primary)';
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)';
-                  (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.5)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--c-border-strong)';
+                  (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-secondary)';
                 }}
               >
                 <X size={14} />
@@ -513,15 +513,15 @@ const AITaskPanel: React.FC<AITaskPanelProps> = ({ isOpen, onClose, onAddTasks }
                       onClick={() => setPrompt(ex)}
                       style={{
                         padding: '4px 10px', borderRadius: 20,
-                        border: '1px solid rgba(196,181,253,0.2)',
-                        background: 'rgba(196,181,253,0.06)',
-                        color: 'rgba(196,181,253,0.75)',
+                        border: '1px solid rgba(196,181,253,0.35)',
+                        background: 'rgba(196,181,253,0.10)',
+                        color: '#c4b5fd',
                         fontSize: 11, fontWeight: 600, cursor: 'pointer',
                         fontFamily: 'inherit', transition: 'all 0.15s',
                         opacity: loading ? 0.4 : 1,
                       }}
-                      onMouseEnter={e => { if (!loading) { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,181,253,0.14)'; (e.currentTarget as HTMLButtonElement).style.color = '#c4b5fd'; } }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,181,253,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(196,181,253,0.75)'; }}
+                      onMouseEnter={e => { if (!loading) { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,181,253,0.20)'; (e.currentTarget as HTMLButtonElement).style.color = '#e9d5ff'; } }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,181,253,0.10)'; (e.currentTarget as HTMLButtonElement).style.color = '#c4b5fd'; }}
                     >
                       {ex}
                     </button>
@@ -604,7 +604,7 @@ const AITaskPanel: React.FC<AITaskPanelProps> = ({ isOpen, onClose, onAddTasks }
                 <div style={{
                   display: 'flex', alignItems: 'flex-start', gap: 8,
                   padding: '11px 14px', borderRadius: 9,
-                  background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)',
+                  background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)',
                 }}>
                   <AlertCircle size={14} color="#f87171" style={{ marginTop: 1, flexShrink: 0 }} />
                   <p style={{ margin: 0, color: '#f87171', fontSize: 13 }}>{error}</p>
@@ -622,8 +622,8 @@ const AITaskPanel: React.FC<AITaskPanelProps> = ({ isOpen, onClose, onAddTasks }
                   <div style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     padding: '10px 14px', borderRadius: 10,
-                    background: 'linear-gradient(135deg, rgba(196,181,253,0.08), rgba(56,189,248,0.06))',
-                    border: '1px solid rgba(196,181,253,0.18)',
+                    background: 'linear-gradient(135deg, rgba(196,181,253,0.14), rgba(56,189,248,0.10))',
+                    border: '1px solid rgba(196,181,253,0.35)',
                   }}>
                     <Sparkles size={13} color="#c4b5fd" />
                     <span style={{ fontSize: 13, color: 'var(--c-text-primary)', fontWeight: 600 }}>

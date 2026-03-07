@@ -26,7 +26,7 @@ const PriorityPills: React.FC<PriorityPillsProps> = ({ value, onChange }) => (
         >
           <span style={{
             width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
-            background: active ? cfg.color : 'rgba(255,255,255,0.2)',
+            background: active ? cfg.color : 'var(--c-text-dim)',
             transition: 'background 0.15s',
             boxShadow: active ? `0 0 6px ${cfg.color}88` : 'none',
           }} />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSidebar } from './SidebarContext';
 
@@ -21,8 +21,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, navKey, onClick,
   };
 
   const accentColor = variant === 'danger' ? '#ef4444' : '#6366F1';
-  const hoverBg     = variant === 'danger' ? 'rgba(239,68,68,0.10)' : 'rgba(99,102,241,0.10)';
-  const activeBg    = variant === 'danger' ? 'rgba(239,68,68,0.14)' : 'rgba(99,102,241,0.16)';
+  const hoverBg     = variant === 'danger' ? 'rgba(239,68,68,0.14)' : 'rgba(99,102,241,0.15)';
+  const activeBg    = variant === 'danger' ? 'rgba(239,68,68,0.20)' : 'rgba(99,102,241,0.22)';
   const textColor   = isActive
     ? (variant === 'danger' ? '#fca5a5' : 'var(--c-accent)')
     : hovered

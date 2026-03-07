@@ -431,8 +431,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
       >
         {[
           { label: 'Total',   value: total,   color: 'var(--c-accent)',  bg: 'var(--c-accent-bg)',       border: 'var(--c-border-accent)'  },
-          { label: 'Pending', value: pending,  color: '#f59e0b', bg: 'rgba(245,158,11,0.08)',   border: 'rgba(245,158,11,0.18)'  },
-          { label: 'Done',    value: done,     color: 'var(--c-green)', bg: 'var(--c-green-glow)',    border: 'rgba(34,197,94,0.22)'   },
+          { label: 'Pending', value: pending,  color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',   border: 'rgba(245,158,11,0.30)'  },
+          { label: 'Done',    value: done,     color: 'var(--c-green)', bg: 'var(--c-green-glow)',    border: 'rgba(34,197,94,0.32)'   },
         ].map((s, i) => (
           <motion.div
             key={s.label}
@@ -533,9 +533,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
                 <button
                   type="button"
                   onClick={() => { setPanelOpen(false); setEditingId(null); }}
-                  style={{ width: 32, height: 32, borderRadius: 8, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.85)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.5)'; }}
+                  style={{ width: 32, height: 32, borderRadius: 8, cursor: 'pointer', border: '1px solid var(--c-border-strong)', background: 'var(--c-surface)', color: 'var(--c-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--c-accent)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-primary)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--c-border-strong)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-secondary)'; }}
                 >
                   <X size={14} />
                 </button>
@@ -551,7 +551,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
                     overlayStyle={isMobile ? undefined : { left: 'auto', right: 0, width: 460 }}
                   />
                   {panelError && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 14px', borderRadius: 9, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 14px', borderRadius: 9, background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)' }}>
                       <X size={13} color="#f87171" />
                       <p style={{ margin: 0, color: '#f87171', fontSize: 13 }}>{panelError}</p>
                     </div>

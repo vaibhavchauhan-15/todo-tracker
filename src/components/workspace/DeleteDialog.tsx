@@ -44,7 +44,8 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ onConfirm, onCancel }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
           <div style={{
             width: 38, height: 38, borderRadius: 10,
-            background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(239,68,68,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: '1px solid rgba(239,68,68,0.35)',
           }}>
             <Trash2 size={18} color="#ef4444" />
           </div>
