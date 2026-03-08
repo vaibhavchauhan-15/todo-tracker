@@ -2,6 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useSidebar } from './sidebar/SidebarContext';
 import Sidebar from './sidebar/Sidebar';
+import MobileBottomNav from './MobileBottomNav';
+import { useIsMobile } from './workspace/useIsMobile';
 
 interface LayoutProps {
   user: {
@@ -21,6 +23,31 @@ const SIDEBAR_COLLAPSED = 70;
 
 const Layout: React.FC<LayoutProps> = ({ user, children, onCreateTask, onLogout, onNavChange, streak }) => {
   const { expanded } = useSidebar();
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--c-bg)' }}>
+        <main
+          style={{
+            flex: 1,
+            minHeight: '100vh',
+            overflowX: 'hidden',
+            background: 'var(--c-bg)',
+            paddingBottom: 80,
+          }}
+        >
+          {children}
+        </main>
+        <MobileBottomNav
+          user={user}
+          streak={streak ?? 0}
+          onCreateTask={onCreateTask}
+          onLogout={onLogout}
+        />
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--c-bg)' }}>

@@ -404,7 +404,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
 
   /* ─── Render ─────────────────────────────────────────────── */
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px clamp(16px, 4vw, 48px)' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '16px 12px' : '32px clamp(16px, 4vw, 48px)' }}>
 
       {/* ── Header ── */}
       <motion.div
@@ -412,17 +412,41 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
         animate={{ opacity: 1, y: 0 }}
         style={{ marginBottom: 28 }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        {isMobile ? (
+          /* ── Mobile header: title on top, date + buttons on second row ── */
           <div>
-            <h1 style={{ margin: 0, color: 'var(--c-text-primary)', fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em' }}>
-              {activeView === 'all' ? 'All Tasks' : activeView === 'completed' ? 'Completed Tasks' : 'My Workspace'}
+            <h1 style={{ margin: 0, color: 'var(--c-text-primary)', fontSize: 18, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+              {activeView === 'all' ? 'All Tasks' : activeView === 'completed' ? 'Completed' : 'My Workspace'}
             </h1>
-            <p style={{ margin: '4px 0 0', color: 'var(--c-text-secondary)', fontSize: 14 }}>
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
+              <p style={{ margin: 0, color: 'var(--c-text-secondary)', fontSize: 12 }}>
+                {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+              </p>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                <Btn18
+                  type="button"
+                  onClick={() => setAiOpen(true)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, padding: '6px 10px', borderRadius: 10 }}
+                >
+                  <Sparkles size={11} strokeWidth={2} /> AI Generate
+                </Btn18>
+                <Btn18 onClick={() => { setPanelForm({ title: '', description: '', priority: 'medium', category: activeCategory, dueDate: today, dueTime: '' }); setPanelMode('add'); setPanelOpen(true); }} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, padding: '6px 10px', borderRadius: 10 }}>
+                  <Plus size={11} strokeWidth={2.5} /> Add Task
+                </Btn18>
+              </div>
+            </div>
           </div>
-
-          {activeView !== 'completed' && (
+        ) : (
+          /* ── Desktop header ── */
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <h1 style={{ margin: 0, color: 'var(--c-text-primary)', fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em' }}>
+                {activeView === 'all' ? 'All Tasks' : activeView === 'completed' ? 'Completed Tasks' : 'My Workspace'}
+              </h1>
+              <p style={{ margin: '4px 0 0', color: 'var(--c-text-secondary)', fontSize: 14 }}>
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+              </p>
+            </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <Btn18
                 type="button"
@@ -435,8 +459,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
                 <Plus size={14} strokeWidth={2.5} /> Add Task
               </Btn18>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </motion.div>
 
       {/* ── Unified View Tabs ── */}
@@ -447,11 +471,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
         style={{ marginBottom: 24 }}
       >
         <div style={{
-          display: 'flex', gap: 2, padding: '4px',
+          display: 'flex', gap: isMobile ? 1 : 2, padding: isMobile ? '3px' : '4px',
           background: 'var(--c-surface)', borderRadius: 14,
           border: '1px solid var(--c-border)',
-          width: isMobile ? '100%' : 'fit-content',
-          overflowX: isMobile ? 'auto' : 'visible',
+          width: '100%',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
           position: 'relative',
         }}>
           {([
@@ -468,14 +493,15 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
                 aria-selected={active}
                 role="tab"
                 style={{
-                  position: 'relative', padding: '7px 20px', borderRadius: 10,
+                  position: 'relative', padding: isMobile ? '5px 10px' : '7px 20px', borderRadius: 10,
                   border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                  fontSize: 13, fontWeight: 700,
+                  fontSize: isMobile ? 11 : 13, fontWeight: 700,
                   background: 'transparent',
                   color: active ? '#fff' : 'var(--c-text-secondary)',
                   transition: 'color 0.2s ease',
                   zIndex: 1, outline: 'none',
                   whiteSpace: 'nowrap',
+                  flex: isMobile ? '1 0 auto' : undefined,
                 }}
                 onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-accent)'; } }}
                 onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = 'var(--c-text-secondary)'; } }}
@@ -504,7 +530,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 14, marginBottom: 24 }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: isMobile ? 8 : 14, marginBottom: isMobile ? 16 : 24 }}
       >
         {[
           { label: 'Total',   value: total,   color: 'var(--c-accent)',  bg: 'var(--c-accent-bg)',       border: 'var(--c-border-accent)'  },
@@ -517,12 +543,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + i * 0.06 }}
             style={{
-              padding: '16px 20px', borderRadius: 12, textAlign: 'center',
+              padding: isMobile ? '10px 6px' : '16px 20px', borderRadius: 12, textAlign: 'center',
               background: s.bg, border: `1px solid ${s.border}`,
             }}
           >
-            <div style={{ color: s.color, fontWeight: 800, fontSize: 28, lineHeight: 1 }}>{s.value}</div>
-            <div style={{ color: 'var(--c-text-secondary)', fontSize: 11, fontWeight: 600, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
+            <div style={{ color: s.color, fontWeight: 800, fontSize: isMobile ? 20 : 28, lineHeight: 1 }}>{s.value}</div>
+            <div style={{ color: 'var(--c-text-secondary)', fontSize: isMobile ? 9 : 11, fontWeight: 600, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
           </motion.div>
         ))}
       </motion.div>
