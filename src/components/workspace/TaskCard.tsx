@@ -14,9 +14,9 @@ export interface TaskCardProps {
   onEditOpen: (task: Task) => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({
+const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard({
   task, index, onToggle, onDeleteClick, onEditOpen,
-}) => {
+}, ref) {
   const pc = PRIORITY_CFG[task.priority as Priority] ?? PRIORITY_CFG.medium;
   const isDone = task.status === 'completed';
 
@@ -28,6 +28,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
   return (
     <motion.div
+      ref={ref}
       layout
       initial={{ opacity: 0, y: 18, scale: 0.95 }}
       animate={{ opacity: isDone ? 0.62 : 1, y: 0, scale: 1 }}
@@ -157,6 +158,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
         </div>
     </motion.div>
   );
-};
+});
 
 export default TaskCard;
