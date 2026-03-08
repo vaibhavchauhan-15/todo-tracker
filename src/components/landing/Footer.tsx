@@ -8,21 +8,23 @@ interface FooterProps {
   onGetStarted: () => void;
 }
 
-const productLinks = ['Features', 'Pricing', 'Updates', 'Changelog'];
-const resourceLinks = ['Blog', 'Documentation', 'Help Center', 'Community'];
-const companyLinks = ['About', 'Privacy', 'Terms', 'Contact'];
-const legalLinks = ['Privacy Policy', 'Terms of Service', 'Cookie Policy'];
-
-const socialIcons = [
-  { icon: <Twitter size={16} />, href: '#' },
-  { icon: <Github size={16} />, href: '#' },
-  { icon: <Linkedin size={16} />, href: '#' },
+const productLinks: { label: string; href: string }[] = [
+  { label: 'Features', href: '#features' },
+  { label: 'Pricing', href: '#pricing' },
+  { label: 'How It Works', href: '#how-it-works' },
+  { label: 'FAQ', href: '#faq' },
 ];
 
-const FooterLink: React.FC<{ label: string }> = ({ label }) => (
+const socialIcons = [
+  { icon: <Twitter size={16} />, href: 'https://x.com/VaibhavCh_15', label: 'Twitter' },
+  { icon: <Github size={16} />, href: 'https://github.com/vaibhavchauhan-15/todo-tracker', label: 'GitHub' },
+  { icon: <Linkedin size={16} />, href: 'https://www.linkedin.com/in/vaibhavchauhan15/', label: 'LinkedIn' },
+];
+
+const FooterLink: React.FC<{ label: string; href: string }> = ({ label, href }) => (
   <div style={{ marginBottom: 10 }}>
     <a
-      href="#"
+      href={href}
       style={{ color: C.textSecondary, fontSize: 14, textDecoration: 'none', transition: 'color 0.2s' }}
       onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = '#fff')}
       onMouseLeave={(e) => ((e.target as HTMLAnchorElement).style.color = C.textSecondary)}
@@ -36,7 +38,7 @@ const Footer: React.FC<FooterProps> = () => (
   <footer style={{ background: C.bgDarker, borderTop: `1px solid ${C.border}`, padding: '64px 40px 32px' }}>
     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
       <div
-        style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 40, marginBottom: 56 }}
+        style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 40, marginBottom: 56 }}
         className="footer-grid"
       >
         {/* Brand */}
@@ -51,10 +53,13 @@ const Footer: React.FC<FooterProps> = () => (
             AI-powered task management for modern productivity. Build habits, track streaks, and get things done.
           </p>
           <div style={{ display: 'flex', gap: 10 }}>
-            {socialIcons.map(({ icon, href }, i) => (
+            {socialIcons.map(({ icon, href, label }) => (
               <a
-                key={i}
+                key={label}
                 href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
                 style={{
                   width: 36, height: 36, borderRadius: 9,
                   background: 'rgba(255,255,255,0.05)',
@@ -77,18 +82,10 @@ const Footer: React.FC<FooterProps> = () => (
           </div>
         </div>
 
-        {/* Columns */}
+        {/* Product column */}
         <div className="footer-col">
           <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 16, letterSpacing: '0.04em' }} className="footer-col-title">Product</div>
-          {productLinks.map((l) => <FooterLink key={l} label={l} />)}
-        </div>
-        <div className="footer-col">
-          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 16, letterSpacing: '0.04em' }} className="footer-col-title">Resources</div>
-          {resourceLinks.map((l) => <FooterLink key={l} label={l} />)}
-        </div>
-        <div className="footer-col">
-          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 16, letterSpacing: '0.04em' }} className="footer-col-title">Company</div>
-          {companyLinks.map((l) => <FooterLink key={l} label={l} />)}
+          {productLinks.map((l) => <FooterLink key={l.label} label={l.label} href={l.href} />)}
         </div>
       </div>
 
@@ -101,20 +98,8 @@ const Footer: React.FC<FooterProps> = () => (
           flexWrap: 'wrap', gap: 12,
         }}
       >
-        <span style={{ color: C.textSecondary, fontSize: 13 }}>© 2026 TaskMaster. All rights reserved.</span>
-        <div style={{ display: 'flex', gap: 20 }}>
-          {legalLinks.map((l) => (
-            <a
-              key={l}
-              href="#"
-              style={{ color: C.textSecondary, fontSize: 13, textDecoration: 'none', transition: 'color 0.2s' }}
-              onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = '#fff')}
-              onMouseLeave={(e) => ((e.target as HTMLAnchorElement).style.color = C.textSecondary)}
-            >
-              {l}
-            </a>
-          ))}
-        </div>
+        <span style={{ color: C.textSecondary, fontSize: 13 }}>© 2026 TaskMaster by <a href="https://www.linkedin.com/in/vaibhavchauhan15/" target="_blank" rel="noopener noreferrer" style={{ color: '#818CF8', textDecoration: 'none' }}>Vaibhav Chauhan</a>. All rights reserved.</span>
+        <span style={{ color: C.textSecondary, fontSize: 13 }}>Made with ❤️ in India</span>
       </div>
     </div>
 
@@ -122,7 +107,7 @@ const Footer: React.FC<FooterProps> = () => (
       @media (max-width: 640px) {
         footer { padding: 40px 16px 24px !important; }
         .footer-grid {
-          grid-template-columns: 1fr 1fr 1fr !important;
+          grid-template-columns: 1fr 1fr !important;
           gap: 24px 12px !important;
         }
         .footer-brand { grid-column: 1 / -1; }
@@ -131,8 +116,7 @@ const Footer: React.FC<FooterProps> = () => (
         .footer-col-title { font-size: 12px !important; margin-bottom: 10px !important; }
         .footer-col a { font-size: 12px !important; }
         .footer-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
-        .footer-bottom > div { gap: 12px !important; flex-wrap: wrap; }
-        .footer-bottom a, .footer-bottom span { font-size: 11px !important; }
+        .footer-bottom span { font-size: 11px !important; }
       }
     `}</style>
   </footer>

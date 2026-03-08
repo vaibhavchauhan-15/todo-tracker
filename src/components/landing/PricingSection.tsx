@@ -52,7 +52,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onGetStarted }) => (
         >
           <div style={{ marginBottom: 16 }}>
             <div className="price-label" style={{ color: C.textSecondary, fontSize: 14, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Free</div>
-            <div className="price-val" style={{ fontSize: 48, fontWeight: 800, color: '#fff', lineHeight: 1 }}>$0</div>
+            <div className="price-val" style={{ fontSize: 48, fontWeight: 800, color: '#fff', lineHeight: 1 }}>₹0</div>
             <div className="price-sub" style={{ color: C.textSecondary, fontSize: 14, marginTop: 6 }}>Forever free</div>
           </div>
           <div style={{ flex: 1 }}>
@@ -103,7 +103,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onGetStarted }) => (
           </div>
           <div style={{ marginBottom: 16 }}>
             <div className="price-label" style={{ color: '#818CF8', fontSize: 14, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Pro</div>
-            <div className="price-val" style={{ fontSize: 48, fontWeight: 800, color: '#fff', lineHeight: 1 }}>$9</div>
+            <div className="price-val" style={{ fontSize: 48, fontWeight: 800, color: '#fff', lineHeight: 1 }}>₹749</div>
             <div className="price-sub" style={{ color: C.textSecondary, fontSize: 14, marginTop: 6 }}>per month</div>
           </div>
           <div style={{ flex: 1 }}>
