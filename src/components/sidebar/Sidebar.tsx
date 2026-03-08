@@ -271,7 +271,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onCreateTask, onLogout, onNavCh
             padding: '10px',
             display: 'flex',
             flexDirection: 'column',
-            minHeight: 95,
+            minHeight: 101,
           }}
           onMouseEnter={() => {
             if (!expanded) {
@@ -338,7 +338,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onCreateTask, onLogout, onNavCh
             marginTop: 9,
             borderTop: '1px solid var(--c-border)',
             position: 'relative',
-            height: 30,
+            height: 36,
             flexShrink: 0,
           }}>
             {/* Expanded: full "N day streak" label */}
@@ -351,24 +351,25 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onCreateTask, onLogout, onNavCh
                 pointerEvents: 'none',
               }}
             >
-              <Flame size={13} fill={streak > 0 ? '#fb923c' : 'var(--c-text-dim)'} strokeWidth={0} />
+              <Flame size={14} fill={streak > 0 ? '#fb923c' : 'var(--c-text-dim)'} strokeWidth={0} />
               <span style={{ fontSize: 12, fontWeight: 600, color: streak > 0 ? '#fb923c' : 'var(--c-text-dim)', whiteSpace: 'nowrap' }}>
                 {streak > 0 ? `${streak} day streak` : 'No streak yet'}
               </span>
             </motion.div>
-            {/* Collapsed: compact flame + count, centered */}
+            {/* Collapsed: large flame + day count, centered */}
             <motion.div
               animate={{ opacity: expanded ? 0 : 1 }}
               transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
               style={{
-                position: 'absolute', top: 8, left: 0, right: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                position: 'absolute', top: 5, left: 0, right: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3,
                 pointerEvents: 'none',
               }}
             >
-              <Flame size={12} fill={streak > 0 ? '#fb923c' : 'var(--c-text-dim)'} strokeWidth={0} />
+              <Flame size={20} fill={streak > 0 ? '#fb923c' : 'var(--c-text-dim)'} strokeWidth={0}
+                style={{ filter: streak > 0 ? 'drop-shadow(0 0 5px rgba(249,115,22,0.6))' : 'none' }} />
               {streak > 0 && (
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#fb923c', lineHeight: 1 }}>{streak}</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: '#fb923c', lineHeight: 1, letterSpacing: '-0.02em' }}>{streak}</span>
               )}
             </motion.div>
           </div>

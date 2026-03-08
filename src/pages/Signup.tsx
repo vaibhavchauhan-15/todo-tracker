@@ -406,6 +406,8 @@ const Signup: React.FC<SignupProps> = ({ onAuthStateChange }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [signUpSuccess, setSignUpSuccess] = useState(false);
+  const [signUpEmail, setSignUpEmail] = useState('');
   const [googleHover, setGoogleHover] = useState(false);
   const [submitHover, setSubmitHover] = useState(false);
   const [loginHover, setLoginHover] = useState(false);
@@ -450,19 +452,64 @@ const Signup: React.FC<SignupProps> = ({ onAuthStateChange }) => {
         },
       });
       if (error) throw error;
-      if (authData.user) {
-        const u = authData.user;
-        onAuthStateChange({
-          uid: u.id,
-          email: u.email ?? null,
-          displayName: u.user_metadata?.full_name || null,
-          photoURL: null,
-        });
+      if (authData.session) {
+        // Email auto-confirmed — App.tsx's onAuthStateChange listener handles navigation
+        // No manual call needed; it would race with the Supabase listener
+      } else if (authData.user) {
+        // Email confirmation required — show success message
+        setSignUpEmail(data.email);
+        setSignUpSuccess(true);
       }
     } catch (err: any) {
+      console.error('[Signup] Supabase error:', err);
       setAuthError(friendlyError(err.message));
     }
   };
+
+  if (signUpSuccess) {
+    return (
+      <div style={s.page} role="main">
+        <div style={s.blob1 as React.CSSProperties} aria-hidden="true" />
+        <div style={s.blob2 as React.CSSProperties} aria-hidden="true" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          style={{ width: '100%', maxWidth: 420, zIndex: 1 }}
+        >
+          <div style={{ ...s.card, textAlign: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(16,185,129,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CheckCircle size={28} style={{ color: '#10B981' }} />
+              </div>
+              <h2 style={{ ...s.title, fontSize: 22 }}>Check your email</h2>
+              <p style={{ ...s.description, maxWidth: 320 }}>
+                We sent a confirmation link to <strong style={{ color: 'var(--c-text-primary)' }}>{signUpEmail}</strong>.
+                Click the link in the email to activate your account.
+              </p>
+              <p style={{ ...s.description, fontSize: 12, marginTop: 4 }}>
+                Didn't receive it? Check your spam folder, or{' '}
+                <button
+                  type="button"
+                  style={{ ...s.redirectLink, fontSize: 12 }}
+                  onClick={() => { setSignUpSuccess(false); setSignUpEmail(''); }}
+                >
+                  try again
+                </button>.
+              </p>
+              <button
+                type="button"
+                style={{ ...s.redirectLink, marginTop: 8 }}
+                onClick={() => navigate('/login')}
+              >
+                Go to login
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div style={s.page} role="main">
@@ -502,8 +549,9 @@ const Signup: React.FC<SignupProps> = ({ onAuthStateChange }) => {
               aria-label="Continue with Google"
               style={{
                 ...s.socialBtn,
-                background: googleHover ? '#F9FAFB' : '#ffffff',
-                borderColor: googleHover ? 'var(--c-accent)' : '#E5E7EB',
+                background: googleHover ? '#F1F3F4' : '#ffffff',
+                borderColor: googleHover ? '#dadce0' : '#dadce0',
+                color: '#3C4043',
               }}
               onClick={signInWithGoogle}
               onMouseEnter={() => setGoogleHover(true)}
@@ -733,19 +781,40 @@ const PasswordInputField: React.FC<PasswordInputFieldProps> = ({
 function friendlyError(message: string): string {
   if (!message) return 'Something went wrong. Please try again.';
   const m = message.toLowerCase();
-  if (m.includes('already registered') || m.includes('user already exists') || m.includes('already been registered')) {
+  if (
+    m.includes('already registered') ||
+    m.includes('user already exists') ||
+    m.includes('already been registered') ||
+    m.includes('email address is already used')
+  ) {
     return 'An account with this email already exists. Please sign in.';
   }
-  if (m.includes('invalid email')) {
+  if (m.includes('signup') && (m.includes('disabled') || m.includes('not allowed'))) {
+    return 'Email sign-up is currently disabled. Please contact support or try signing in with Google.';
+  }
+  if (m.includes('signups not allowed') || m.includes('signups are disabled')) {
+    return 'New registrations are currently disabled. Please try again later.';
+  }
+  if (m.includes('email') && m.includes('disabled')) {
+    return 'Email sign-up is currently disabled. Try signing in with Google.';
+  }
+  if (m.includes('invalid email') || m.includes('email address is invalid')) {
     return 'Invalid email address.';
   }
-  if (m.includes('password should be at least') || m.includes('weak password')) {
+  if (m.includes('password should be at least') || m.includes('weak password') || m.includes('password is too short')) {
     return 'Password is too weak. Please choose a stronger password.';
+  }
+  if (m.includes('email rate limit') || m.includes('rate limit exceeded')) {
+    return 'Too many sign-up attempts. Supabase limits confirmation emails to a few per hour. Please wait ~1 hour and try again, or contact support.';
   }
   if (m.includes('too many requests') || m.includes('rate limit')) {
     return 'Too many attempts. Please wait a moment and try again.';
   }
-  return 'Something went wrong. Please try again.';
+  if (m.includes('network') || m.includes('fetch')) {
+    return 'Network error. Please check your connection and try again.';
+  }
+  // Surface the raw Supabase message for any unrecognised error
+  return message;
 }
 
 export default Signup;

@@ -22,6 +22,21 @@ interface WorkspaceProps {
   onViewChange?: (key: string) => void;
 }
 
+/* ── Global streak helpers (localStorage) ── */
+function loadGlobalStreak(uid: string): StreakData {
+  try {
+    const raw = localStorage.getItem(`global_streak_${uid}`);
+    if (raw) return JSON.parse(raw) as StreakData;
+  } catch {}
+  return { count: 0, lastDate: '' };
+}
+
+function saveGlobalStreak(uid: string, data: StreakData): void {
+  try {
+    localStorage.setItem(`global_streak_${uid}`, JSON.stringify(data));
+  } catch {}
+}
+
 const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, triggerAdd, onAddHandled, onStreakChange, onViewChange }) => {
   const [tasks, setTasks]               = useState<Task[]>([]);
   const [loading, setLoading]           = useState(true);
@@ -33,8 +48,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
   const [aiOpen, setAiOpen]             = useState(false);
   const [deleteId, setDeleteId]         = useState<string | null>(null);
   const [editingId, setEditingId]       = useState<string | null>(null);
-  const [streak, setStreak]             = useState<StreakData>({ count: 0, lastDate: '' });
-  const streakRef                       = useRef<StreakData>({ count: 0, lastDate: '' });
+  const [streak, setStreak]             = useState<StreakData>(() => loadGlobalStreak(user.uid));
+  const streakRef                       = useRef<StreakData>(loadGlobalStreak(user.uid));
   const isMobile                        = useIsMobile();
   const activeCategory: Category        = (activeView !== 'all' && activeView !== 'completed') ? activeView as Category : 'daily';
 
@@ -52,27 +67,46 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.uid]);
 
-  /* ── Recompute daily progress & streak when tasks change ── */
+  /* ── Recompute global streak when tasks change (any category) ── */
   useEffect(() => {
+    if (loading) return; // wait until tasks are loaded
+
     const todayDate = new Date().toISOString().split('T')[0];
     const yesterdayDate = new Date(Date.now() - 86_400_000).toISOString().split('T')[0];
 
-    const dailyToday = tasks.filter(t => (t.category ?? 'daily') === 'daily' && t.dueDate === todayDate);
-
-    const anyDone = dailyToday.some(t => t.status === 'completed');
+    // Any task from ANY category completed today
+    const anyDone = tasks.some(t => t.lastCompletedDate === todayDate);
     const prev = streakRef.current;
+
     if (anyDone && prev.lastDate !== todayDate) {
+      // First completion of today — continue or restart streak
       const next = prev.lastDate === yesterdayDate ? prev.count + 1 : 1;
       const updated: StreakData = { count: next, lastDate: todayDate };
       streakRef.current = updated;
       setStreak(updated);
+      saveGlobalStreak(user.uid, updated);
       onStreakChange?.(next);
-    } else if (!anyDone) {
+    } else if (!anyDone && prev.lastDate === todayDate) {
+      // All of today's completions were undone — roll back today's increment
+      const next = Math.max(0, prev.count - 1);
+      const updated: StreakData = { count: next, lastDate: next > 0 ? yesterdayDate : '' };
+      streakRef.current = updated;
+      setStreak(updated);
+      saveGlobalStreak(user.uid, updated);
+      onStreakChange?.(next);
+    } else if (!anyDone && prev.lastDate !== '' && prev.lastDate < yesterdayDate) {
+      // A day was missed — streak is broken
+      const updated: StreakData = { count: 0, lastDate: '' };
+      streakRef.current = updated;
+      setStreak(updated);
+      saveGlobalStreak(user.uid, updated);
+      onStreakChange?.(0);
+    } else {
       setStreak(prev);
       onStreakChange?.(prev.count);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tasks]);
+  }, [tasks, loading]);
 
   /* ── Sync external category / view from sidebar ── */
   useEffect(() => {
@@ -249,6 +283,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
 
     let streakUpdates: Partial<Task> = {};
     if ((task.category ?? 'daily') === 'daily') {
+      // Per-task streak for daily tasks + global lastCompletedDate tracking
       if (next === 'completed') {
         const cur = task.streak ?? 0;
         const last = task.lastCompletedDate ?? '';
@@ -269,6 +304,13 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
           const lastDate = newStreak > 0 ? yesterdayDate : '';
           streakUpdates = { streak: newStreak, lastCompletedDate: lastDate };
         }
+      }
+    } else {
+      // Non-daily tasks: track lastCompletedDate for global streak only
+      if (next === 'completed') {
+        streakUpdates = { lastCompletedDate: todayDate };
+      } else if (task.lastCompletedDate === todayDate) {
+        streakUpdates = { lastCompletedDate: '' };
       }
     }
 
