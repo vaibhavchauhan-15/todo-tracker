@@ -175,8 +175,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
         description:       t.description.trim(),
         priority:          t.priority as import('./workspace/types').Task['priority'],
         category:          cat as string,
-        dueDate:           '',
-        dueTime:           '',
+        dueDate:           t.dueDate ?? '',
+        dueTime:           t.dueTime ?? '',
         status:            'pending' as const,
         completed:         false,
         streak:            0,
@@ -212,6 +212,14 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
   const handlePanelSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!panelForm.title.trim()) return;
+    if (!panelForm.dueTime.trim()) {
+      setPanelError('Please set a due time.');
+      return;
+    }
+    if (panelForm.category !== 'daily' && !panelForm.dueDate.trim()) {
+      setPanelError('Please set a due date.');
+      return;
+    }
     setPanelError(null);
     const snapshot = { ...panelForm };
     const isEdit = panelMode === 'edit';
@@ -358,11 +366,38 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
   };
 
   /* ── Derived data ── */
-  const filtered = activeView === 'all'
-    ? tasks
-    : activeView === 'completed'
-    ? tasks.filter(t => t.status === 'completed')
-    : tasks.filter(t => (t.category ?? 'daily') === activeView);
+  const sortTasks = (list: Task[]) => {
+    return [...list].sort((a, b) => {
+      // Completed always go to the bottom
+      if (a.status === 'completed' && b.status !== 'completed') return 1;
+      if (a.status !== 'completed' && b.status === 'completed') return -1;
+
+      // Combine date + time into a comparable string (YYYY-MM-DDTHH:MM)
+      const key = (t: Task) => {
+        const d = t.dueDate?.trim() ?? '';
+        const time = t.dueTime?.trim() ?? '';
+        if (d && time) return `${d}T${time}`;
+        if (d)         return `${d}T99:99`; // date but no time → after timed tasks that day
+        if (time)      return `0000-00-00T${time}`; // time but no date → near top
+        return '9999-99-99T99:99'; // no date & no time → very bottom
+      };
+
+      const ka = key(a);
+      const kb = key(b);
+      if (ka !== kb) return ka < kb ? -1 : 1;
+
+      // Stable fallback: newer tasks first within same slot
+      return (b.createdAt ?? '').localeCompare(a.createdAt ?? '');
+    });
+  };
+
+  const filtered = sortTasks(
+    activeView === 'all'
+      ? tasks
+      : activeView === 'completed'
+      ? tasks.filter(t => t.status === 'completed')
+      : tasks.filter(t => (t.category ?? 'daily') === activeView)
+  );
   const pending   = filtered.filter(t => t.status === 'pending').length;
   const done      = filtered.filter(t => t.status === 'completed').length;
   const total     = filtered.length;
@@ -629,7 +664,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
                   </button>
                   <Btn18
                     type="submit"
-                    disabled={!panelForm.title.trim()}
+                    disabled={!panelForm.title.trim() || !panelForm.dueTime.trim() || (panelForm.category !== 'daily' && !panelForm.dueDate.trim())}
                     style={{ padding: '9px 20px', fontSize: 13, fontWeight: 700, textTransform: 'none', letterSpacing: 0, borderRadius: 10, display: 'flex', alignItems: 'center', gap: 6 }}
                   >
                     <Plus size={13} strokeWidth={2.5} /> {panelMode === 'edit' ? 'Save Changes' : 'Add Task'}

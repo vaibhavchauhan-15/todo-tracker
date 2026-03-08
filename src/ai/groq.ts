@@ -4,6 +4,8 @@ export interface AITask {
   title: string;
   description: string;
   priority: Priority;
+  dueDate?: string;
+  dueTime?: string;
 }
 
 export interface AITasksResult {
@@ -17,9 +19,15 @@ export type GoalType = 'study' | 'fitness' | 'productivity' | 'work' | 'personal
 export type TimeCommitment = 'light' | 'moderate' | 'intense';
 export type CategoryFilter = Category | 'all';
 
-function buildSystemPrompt(categoryFilter: CategoryFilter): string {
+function buildSystemPrompt(categoryFilter: CategoryFilter, today: string): string {
+  const dateTimeRules = `
+- daily tasks: include "dueTime" (HH:MM 24-hour format, e.g. "08:00") — NO dueDate
+- weekly/monthly/yearly tasks: include both "dueDate" (YYYY-MM-DD, must be today or in the future, relative to ${today}) and "dueTime" (HH:MM 24-hour format)
+- Assign realistic times based on the task type (morning for exercise, evening for study reviews, etc.)`;
+
   if (categoryFilter === 'all') {
     return `You are an AI productivity assistant for a todo application called TaskMaster.
+Today's date is ${today}.
 
 Your job is to convert a user's goal into structured tasks.
 
@@ -27,7 +35,8 @@ You must generate tasks in four categories: daily, weekly, monthly, yearly.
 
 Rules:
 1. Return ONLY valid JSON — no markdown, no code fences, no explanations
-2. Each task must contain: title (short), description (clear), priority (low | medium | high)
+2. Each task must contain: title (short), description (clear), priority (low | medium | high), and date/time fields:
+${dateTimeRules}
 3. Generate 3-6 daily tasks
 4. Generate 2-4 weekly tasks
 5. Generate 1-3 monthly tasks
@@ -44,12 +53,14 @@ Return JSON in exactly this format:
     yearly:  'Generate 2-4 yearly tasks',
   };
   return `You are an AI productivity assistant for a todo application called TaskMaster.
+Today's date is ${today}.
 
 Your job is to convert a user's goal into structured ${categoryFilter} tasks ONLY.
 
 Rules:
 1. Return ONLY valid JSON — no markdown, no code fences, no explanations
-2. Each task must contain: title (short), description (clear), priority (low | medium | high)
+2. Each task must contain: title (short), description (clear), priority (low | medium | high), and date/time fields:
+${dateTimeRules}
 3. ${countMap[categoryFilter]}
 4. Tasks must be realistic and actionable
 5. Leave all other category arrays empty
@@ -91,6 +102,8 @@ export async function generateAITasks(
   }
   lastCallTime = now;
 
+  const today = new Date().toISOString().split('T')[0];
+
   const apiKey = process.env.REACT_APP_GROQ_API_KEY;
   if (!apiKey) {
     throw new Error('REACT_APP_GROQ_API_KEY is not set. Add it to your .env file.');
@@ -105,11 +118,11 @@ export async function generateAITasks(
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',
       messages: [
-        { role: 'system', content: buildSystemPrompt(categoryFilter) },
+        { role: 'system', content: buildSystemPrompt(categoryFilter, today) },
         { role: 'user', content: buildUserPrompt(prompt, goalType, timeCommitment, categoryFilter) },
       ],
       temperature: 0.7,
-      max_tokens: 600,
+      max_tokens: 800,
     }),
   });
 
@@ -137,18 +150,33 @@ export async function generateAITasks(
     return 'medium';
   };
 
-  const normList = (arr: AITask[]): AITask[] =>
+  const normTime = (t: string | undefined): string => {
+    if (!t) return '';
+    // Accept HH:MM or HH:MM:SS
+    const m = String(t).match(/^([01]?\d|2[0-3]):([0-5]\d)/);
+    return m ? `${m[1].padStart(2, '0')}:${m[2]}` : '';
+  };
+
+  const normDate = (d: string | undefined): string => {
+    if (!d) return '';
+    const m = String(d).match(/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/);
+    return m ? d : '';
+  };
+
+  const normList = (arr: AITask[], cat: Category): AITask[] =>
     (Array.isArray(arr) ? arr : []).map(t => ({
       title: String(t.title ?? '').slice(0, 120),
       description: String(t.description ?? '').slice(0, 300),
       priority: normPriority(t.priority as string),
+      dueTime: normTime((t as any).dueTime),
+      ...(cat !== 'daily' ? { dueDate: normDate((t as any).dueDate) } : {}),
     }));
 
   const allResult: AITasksResult = {
-    daily: normList(parsed.daily),
-    weekly: normList(parsed.weekly),
-    monthly: normList(parsed.monthly),
-    yearly: normList(parsed.yearly),
+    daily:   normList(parsed.daily,   'daily'),
+    weekly:  normList(parsed.weekly,  'weekly'),
+    monthly: normList(parsed.monthly, 'monthly'),
+    yearly:  normList(parsed.yearly,  'yearly'),
   };
 
   // If a specific category was selected, zero out the others

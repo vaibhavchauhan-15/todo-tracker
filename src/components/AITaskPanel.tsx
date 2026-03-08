@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, ChevronDown, Trash2, AlertCircle, Loader2 } from 'lucide-react';
+import { Sparkles, X, ChevronDown, Trash2, AlertCircle, Loader2, CalendarDays, Clock } from 'lucide-react';
 import Btn18 from './ui/Btn18';
 import { generateAITasks, AITask, AITasksResult, GoalType, TimeCommitment, CategoryFilter } from '../ai/groq';
 import { Priority, PRIORITY_CFG, Category } from './workspace/types';
 import { useIsMobile } from './workspace/useIsMobile';
+import { DatePicker } from './ui/date-picker';
+import { ClockTimePicker } from './ui/clock-time-picker';
 
 const DRAWER_WIDTH = 500;
 
@@ -157,6 +159,12 @@ const EditableTask: React.FC<EditableTaskProps> = ({ task, category, onChange, o
     yearly:  '#4ade80',
   };
 
+  const formatDate = (d: string) => {
+    if (!d) return null;
+    const dt = new Date(d + 'T00:00:00');
+    return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
   return (
     <motion.div
       layout
@@ -219,6 +227,33 @@ const EditableTask: React.FC<EditableTaskProps> = ({ task, category, onChange, o
         </button>
       </div>
 
+      {/* ── AI-generated date / time — shown as chips, editable on expand ── */}
+      <div style={{
+        padding: '0 12px 8px',
+        display: 'flex', gap: 8, flexWrap: 'wrap',
+      }}>
+        {category !== 'daily' && (
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            fontSize: 11, color: task.dueDate ? 'var(--c-text-secondary)' : '#f87171',
+            background: 'var(--c-surface)', border: '1px solid var(--c-border)',
+            borderRadius: 999, padding: '2px 8px',
+          }}>
+            <CalendarDays size={10} />
+            {task.dueDate ? formatDate(task.dueDate) : 'No date'}
+          </span>
+        )}
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          fontSize: 11, color: task.dueTime ? 'var(--c-text-secondary)' : '#f87171',
+          background: 'var(--c-surface)', border: '1px solid var(--c-border)',
+          borderRadius: 999, padding: '2px 8px',
+        }}>
+          <Clock size={10} />
+          {task.dueTime || 'No time'}
+        </span>
+      </div>
+
       {/* description edit */}
       <AnimatePresence initial={false}>
         {expanded && (
@@ -230,6 +265,39 @@ const EditableTask: React.FC<EditableTaskProps> = ({ task, category, onChange, o
             style={{ overflow: 'hidden' }}
           >
             <div style={{ padding: '0 12px 10px', borderTop: '1px solid var(--c-border)' }}>
+              {/* Date / Time pickers (editable) */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: category !== 'daily' ? '1fr 1fr' : '1fr',
+                gap: 8, marginTop: 10, marginBottom: 8,
+              }}>
+                {category !== 'daily' && (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 5 }}>
+                      <CalendarDays size={10} style={{ color: 'var(--c-text-secondary)' }} />
+                      <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--c-text-secondary)', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Due Date</span>
+                    </div>
+                    <DatePicker
+                      value={task.dueDate ?? ''}
+                      onChange={v => onChange({ ...task, dueDate: v })}
+                      placeholder="Pick date"
+                      overlayStyle={{ zIndex: 10002 }}
+                    />
+                  </div>
+                )}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 5 }}>
+                    <Clock size={10} style={{ color: 'var(--c-text-secondary)' }} />
+                    <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--c-text-secondary)', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Due Time</span>
+                  </div>
+                  <ClockTimePicker
+                    value={task.dueTime ?? ''}
+                    onChange={v => onChange({ ...task, dueTime: v })}
+                    overlayStyle={{ zIndex: 10002 }}
+                  />
+                </div>
+              </div>
+
               <textarea
                 value={task.description}
                 onChange={e => onChange({ ...task, description: e.target.value })}

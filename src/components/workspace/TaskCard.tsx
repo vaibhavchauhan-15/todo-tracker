@@ -84,17 +84,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 color: pc.color, background: pc.bg, border: `1px solid ${pc.border}`,
               }}>{pc.label.toUpperCase()}</span>
 
-              {task.dueDate && task.category !== 'daily' && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--c-text-secondary)', fontSize: 11 }}>
-                  <CalendarDays size={11} />{formatDate(task.dueDate)}
+              {task.category !== 'daily' && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: task.dueDate ? 'var(--c-text-secondary)' : 'var(--c-text-dim)' }}>
+                  <CalendarDays size={11} />{task.dueDate ? formatDate(task.dueDate) : '—'}
                 </span>
               )}
 
-              {task.dueTime && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--c-text-secondary)', fontSize: 11 }}>
-                  <Clock size={11} />{task.dueTime}
-                </span>
-              )}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: task.dueTime ? 'var(--c-text-secondary)' : 'var(--c-text-dim)' }}>
+                <Clock size={11} />{task.dueTime || '—'}
+              </span>
 
               <span style={{
                 padding: '2px 9px', borderRadius: 999, fontSize: 11, fontWeight: 600,

@@ -64,7 +64,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, onChange, isMobil
 
     {/* Title */}
     <div>
-      <FL>Title *</FL>
+      <FL>Title <span style={{ color: '#f87171' }}>*</span></FL>
       <input
         style={inputBase} value={form.title} required autoFocus
         placeholder="What do you need to do?"
@@ -90,7 +90,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, onChange, isMobil
     <div style={{ display: 'grid', gridTemplateColumns: form.category !== 'daily' ? '1fr 1fr' : '1fr', gap: 12 }}>
       {form.category !== 'daily' && (
         <div>
-          <FL icon={<CalendarDays size={11} />}>Due Date</FL>
+          <FL icon={<CalendarDays size={11} />}>Due Date <span style={{ color: '#f87171' }}>*</span></FL>
           <DatePicker
             value={form.dueDate}
             onChange={v => onChange('dueDate', v)}
@@ -101,7 +101,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, onChange, isMobil
         </div>
       )}
       <div>
-        <FL icon={<Clock size={11} />}>Due Time</FL>
+        <FL icon={<Clock size={11} />}>Due Time <span style={{ color: '#f87171' }}>*</span></FL>
         <ClockTimePicker
           value={form.dueTime}
           onChange={v => onChange('dueTime', v)}
