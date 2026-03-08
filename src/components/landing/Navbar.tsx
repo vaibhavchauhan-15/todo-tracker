@@ -26,6 +26,7 @@ const Navbar: React.FC<NavbarProps> = ({ onGetStarted, onLogin }) => {
         initial={{ y: -70, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: EASE_OUT }}
+        className="landing-navbar"
         style={{
           position: 'fixed',
           top: 0, left: 0, right: 0,
@@ -139,9 +140,61 @@ const Navbar: React.FC<NavbarProps> = ({ onGetStarted, onLogin }) => {
       </AnimatePresence>
 
       <style>{`
-        @media (max-width: 768px) {
+        /* ── Desktop tweaks ── */
+        @media (min-width: 641px) and (max-width: 768px) {
           .desktop-nav { display: none !important; }
           .hamburger-btn { display: block !important; }
+        }
+        /* ── Hide full desktop navbar on mobile ── */
+        @media (max-width: 640px) {
+          .landing-navbar { display: none !important; }
+        }
+      `}</style>
+
+      {/* ── Mobile-only slim top bar ── */}
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.45, ease: EASE_OUT }}
+        className="mobile-topbar"
+        style={{
+          display: 'none',
+          position: 'fixed',
+          top: 0, left: 0, right: 0,
+          zIndex: 100,
+          height: 52,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          background: 'rgba(11,15,25,0.92)',
+          backdropFilter: 'blur(16px)',
+          borderBottom: `1px solid ${C.border}`,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <img src="/logo.png" alt="TaskMaster" style={{ width: 28, height: 28, borderRadius: 8, objectFit: 'contain' }} />
+          <span style={{ color: '#fff', fontWeight: 700, fontSize: 15, letterSpacing: '-0.02em' }}>
+            Task<GradientText>Master</GradientText>
+          </span>
+        </div>
+        <motion.button
+          whileTap={{ scale: 0.93 }}
+          onClick={onGetStarted}
+          style={{
+            background: 'linear-gradient(135deg, #6366F1, #4f46e5)',
+            border: 'none', borderRadius: 10,
+            color: '#fff', fontWeight: 700, fontSize: 12,
+            padding: '7px 14px', cursor: 'pointer',
+            boxShadow: '0 2px 12px rgba(99,102,241,0.4)',
+          }}
+        >
+          Get Started
+        </motion.button>
+      </motion.div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .mobile-topbar { display: flex !important; }
         }
       `}</style>
     </>

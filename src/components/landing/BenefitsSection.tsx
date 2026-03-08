@@ -12,7 +12,7 @@ const benefits = [
 ];
 
 const BenefitsSection: React.FC = () => (
-  <section style={{ background: C.bgDarker, padding: '96px 40px' }}>
+  <section className="benefits-section" style={{ background: C.bgDarker, padding: '96px 40px' }}>
     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
       <motion.div
         variants={staggerContainer}
@@ -39,6 +39,7 @@ const BenefitsSection: React.FC = () => (
         whileInView="visible"
         viewport={{ once: true }}
         style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 20 }}
+        className="benefits-grid"
       >
         {benefits.map((b) => (
           <motion.div
@@ -67,6 +68,16 @@ const BenefitsSection: React.FC = () => (
         ))}
       </motion.div>
     </div>
+
+    <style>{`
+      @media (max-width: 640px) {
+        .benefits-section { padding: 56px 16px !important; }
+        .benefits-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+        .benefits-grid > div { padding: 16px 12px !important; border-radius: 12px !important; }
+        .benefits-grid h3 { font-size: 13px !important; margin-bottom: 6px !important; }
+        .benefits-grid p { font-size: 12px !important; }
+      }
+    `}</style>
   </section>
 );
 

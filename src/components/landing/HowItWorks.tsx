@@ -72,6 +72,7 @@ const HowItWorks: React.FC = () => (
               key={s.step}
               variants={fadeInUp}
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 20 }}
+              className="step-item"
             >
               <motion.div
                 whileHover={{ scale: 1.1, boxShadow: `0 0 40px ${C.accentGlow}` }}
@@ -82,15 +83,16 @@ const HowItWorks: React.FC = () => (
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: C.accent, flexShrink: 0, transition: 'box-shadow 0.3s',
                 }}
+                className="step-circle"
               >
                 {s.icon}
               </motion.div>
               <div>
-                <div style={{ color: C.accent, fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 8 }}>
+                <div style={{ color: C.accent, fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 8 }} className="step-label">
                   STEP {s.step}
                 </div>
-                <h3 style={{ color: '#fff', fontWeight: 700, fontSize: 18, margin: '0 0 10px' }}>{s.title}</h3>
-                <p style={{ color: C.textSecondary, fontSize: 14, lineHeight: 1.65, margin: 0 }}>{s.desc}</p>
+                <h3 style={{ color: '#fff', fontWeight: 700, fontSize: 18, margin: '0 0 10px' }} className="step-title">{s.title}</h3>
+                <p style={{ color: C.textSecondary, fontSize: 14, lineHeight: 1.65, margin: 0 }} className="step-desc">{s.desc}</p>
               </div>
             </motion.div>
           ))}
@@ -100,8 +102,13 @@ const HowItWorks: React.FC = () => (
 
     <style>{`
       @media (max-width: 640px) {
-        .steps-grid { grid-template-columns: 1fr !important; }
-        .steps-line { display: none !important; }
+        .steps-grid { gap: 4px !important; }
+        .steps-line { top: 24px !important; }
+        .step-circle { width: 48px !important; height: 48px !important; }
+        .step-label { font-size: 9px !important; margin-bottom: 3px !important; }
+        .step-title { font-size: 11px !important; margin-bottom: 0 !important; }
+        .step-desc { display: none !important; }
+        .step-item { gap: 10px !important; }
       }
     `}</style>
   </section>

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle, Play, Sparkles, Star, Users } from 'lucide-react';
+import { ArrowRight, CheckCircle, ChevronDown, Play, Sparkles, Star, Users } from 'lucide-react';
 import GlowButton from '../ui/GlowButton';
 import { C, fadeInUp, staggerContainer } from './tokens';
 import { GradientText, SectionBadge, SecondaryButton } from './shared';
@@ -9,8 +9,48 @@ interface HeroProps {
   onGetStarted: () => void;
 }
 
-const Hero: React.FC<HeroProps> = ({ onGetStarted }) => (
+const Hero: React.FC<HeroProps> = ({ onGetStarted }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Explicit 30fps-friendly playback rate (1× = native fps)
+    video.playbackRate = 1.0;
+
+    // Pause when tab/app goes to background to free GPU resources
+    const handleVisibility = () => {
+      if (document.hidden) {
+        video.pause();
+      } else {
+        video.play().catch(() => {/* autoplay policy – silently ignore */});
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    // Pause when scrolled off-screen, resume when back in view
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(video);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
   <section
+    className="hero-section"
     style={{
       minHeight: '100vh',
       display: 'flex',
@@ -21,21 +61,33 @@ const Hero: React.FC<HeroProps> = ({ onGetStarted }) => (
       padding: '120px 40px 80px',
     }}
   >
-    {/* Full-bleed background video */}
+    {/* Full-bleed background video — GPU-composited for smooth 30fps on mobile */}
     <video
-      src="/video/hero.mp4"
+      ref={videoRef}
       autoPlay
       loop
       muted
       playsInline
+      preload="auto"
+      disablePictureInPicture
+      // @ts-ignore – non-standard but widely supported on iOS/Android
+      disableRemotePlayback
       aria-hidden="true"
       style={{
         position: 'absolute', inset: 0,
         width: '100%', height: '100%',
         objectFit: 'cover', objectPosition: 'center',
         zIndex: 0,
+        // Force GPU compositing layer – eliminates main-thread repaint jank
+        transform: 'translateZ(0)',
+        willChange: 'transform',
+        backfaceVisibility: 'hidden',
       }}
-    />
+    >
+      {/* Mobile-first: load a lighter version when available */}
+      <source src="/video/hero-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
+      <source src="/video/hero.mp4" type="video/mp4" />
+    </video>
 
     {/* Dark overlay for legibility */}
     <div
@@ -98,7 +150,7 @@ const Hero: React.FC<HeroProps> = ({ onGetStarted }) => (
         Organize tasks, track streaks, and build unstoppable productivity habits with TaskMaster.
       </motion.p>
 
-      <motion.div variants={fadeInUp} style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
+      <motion.div variants={fadeInUp} style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }} className="hero-btns">
         <GlowButton onClick={onGetStarted} style={{ fontSize: 17, height: 52, padding: '0 36px', gap: 10 }}>
           Get Started Free <ArrowRight size={18} />
         </GlowButton>
@@ -109,6 +161,7 @@ const Hero: React.FC<HeroProps> = ({ onGetStarted }) => (
 
       <motion.div
         variants={fadeInUp}
+        className="hero-proof"
         style={{ display: 'flex', gap: 32, flexWrap: 'wrap', justifyContent: 'center', marginTop: 4 }}
       >
         {[
@@ -129,7 +182,38 @@ const Hero: React.FC<HeroProps> = ({ onGetStarted }) => (
         ))}
       </motion.div>
     </motion.div>
+
+    {/* Scroll indicator */}
+    <motion.div
+      animate={{ y: [0, 8, 0] }}
+      transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+      style={{
+        position: 'absolute', bottom: 28, left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+        color: 'rgba(255,255,255,0.45)', pointerEvents: 'none',
+      }}
+    >
+      <span style={{ fontSize: 10, letterSpacing: '0.12em', fontWeight: 600 }}>SCROLL</span>
+      <ChevronDown size={18} />
+    </motion.div>
+
+    <style>{`
+      @media (max-width: 640px) {
+        .hero-section { padding: 88px 20px 60px !important; }
+        .hero-btns { gap: 8px !important; flex-wrap: nowrap !important; }
+        .hero-btns button, .hero-btns a, .hero-btns > div {
+          font-size: 13px !important;
+          height: 40px !important;
+          padding: 0 14px !important;
+          gap: 5px !important;
+        }
+        .hero-proof { gap: 14px !important; flex-wrap: wrap !important; }
+        .hero-proof > div { font-size: 12px !important; }
+      }
+    `}</style>
   </section>
-);
+  );
+};
 
 export default Hero;

@@ -14,7 +14,7 @@ const features = [
 ];
 
 const FeaturesSection: React.FC = () => (
-  <section id="features" style={{ background: C.bg, padding: '96px 40px' }}>
+  <section id="features" className="features-section" style={{ background: C.bg, padding: '96px 40px' }}>
     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
       <motion.div
         variants={staggerContainer}
@@ -61,16 +61,19 @@ const FeaturesSection: React.FC = () => (
             <motion.div
               key={f.title}
               variants={fadeInUp}
-              whileHover={{ y: -4, borderColor: `${f.color}44`, boxShadow: '0 16px 48px rgba(0,0,0,0.4)' }}
+              whileHover={{ y: -4, boxShadow: `0 0 0 2px ${f.color}55, 0 16px 48px rgba(0,0,0,0.4)` }}
               style={{
                 background: 'rgba(17,24,39,0.85)',
                 border: `1px solid ${C.border}`,
-                borderRadius: 14, padding: '18px 16px',
+                borderRadius: 14, padding: '16px',
                 backdropFilter: 'blur(20px)',
                 transition: 'border-color 0.3s, box-shadow 0.3s',
                 cursor: 'default',
                 display: 'flex', flexDirection: 'column',
+                aspectRatio: '1 / 1',
+                overflow: 'hidden',
               }}
+              className="feature-card"
             >
               <div
                 style={{
@@ -94,6 +97,7 @@ const FeaturesSection: React.FC = () => (
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
+          className="features-video-wrap"
           style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}
         >
           <div
@@ -104,6 +108,7 @@ const FeaturesSection: React.FC = () => (
             }}
           />
           <div
+            className="features-video-inner"
             style={{
               position: 'relative', zIndex: 1, flex: 1,
               borderRadius: 20, overflow: 'hidden',
@@ -115,7 +120,16 @@ const FeaturesSection: React.FC = () => (
             <video
               src="/video/feature.mp4"
               autoPlay muted loop playsInline
-              style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover', position: 'absolute', inset: 0 }}
+              preload="auto"
+              disablePictureInPicture
+              style={{
+                width: '100%', height: '100%',
+                display: 'block', objectFit: 'cover',
+                position: 'absolute', inset: 0,
+                transform: 'translateZ(0)',
+                willChange: 'transform',
+                backfaceVisibility: 'hidden',
+              }}
             />
           </div>
           <div
@@ -132,10 +146,32 @@ const FeaturesSection: React.FC = () => (
     <style>{`
       @media (max-width: 900px) {
         .features-layout { grid-template-columns: 1fr !important; }
-        .features-layout > div:last-child { min-height: 360px; }
+        .features-video-wrap { order: -1; }
+        /* Square video on tablet/mobile */
+        .features-video-wrap { aspect-ratio: 1 / 1; width: 100%; }
+        .features-video-inner { position: absolute !important; inset: 0 !important; flex: unset !important; border-radius: 20px; }
+        .features-video-wrap > div:first-child { border-radius: 22px; }
       }
-      @media (max-width: 500px) {
-        .feature-cards-grid { grid-template-columns: 1fr !important; }
+      @media (max-width: 640px) {
+        .features-section { padding: 56px 16px !important; }
+        .features-layout { gap: 14px !important; }
+        /* Strictly square on small phones */
+        .features-video-wrap { aspect-ratio: 1 / 1 !important; width: 100% !important; }
+        .feature-cards-grid { grid-template-columns: 1fr 1fr !important; }
+        .feature-card { padding: 12px !important; }
+        .feature-card h3 { font-size: 11px !important; margin-bottom: 2px !important; }
+        .feature-card p { font-size: 10px !important; }
+        .feature-card > div:first-child { width: 30px !important; height: 30px !important; border-radius: 8px !important; margin-bottom: 8px !important; }
+      }
+      @keyframes feature-border-spin {
+        0%   { box-shadow: 2px 0 12px 0 var(--fc, rgba(99,102,241,0.5)), 0 0 0 1px rgba(99,102,241,0.15); }
+        25%  { box-shadow: 0 2px 12px 0 var(--fc, rgba(99,102,241,0.5)), 0 0 0 1px rgba(99,102,241,0.15); }
+        50%  { box-shadow: -2px 0 12px 0 var(--fc, rgba(99,102,241,0.5)), 0 0 0 1px rgba(99,102,241,0.15); }
+        75%  { box-shadow: 0 -2px 12px 0 var(--fc, rgba(99,102,241,0.5)), 0 0 0 1px rgba(99,102,241,0.15); }
+        100% { box-shadow: 2px 0 12px 0 var(--fc, rgba(99,102,241,0.5)), 0 0 0 1px rgba(99,102,241,0.15); }
+      }
+      .feature-card {
+        animation: feature-border-spin 4s linear infinite;
       }
     `}</style>
   </section>

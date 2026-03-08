@@ -32,7 +32,7 @@ const problems = [
 ];
 
 const ProblemSection: React.FC = () => (
-  <section id="how-it-works" style={{ background: C.bgDarker, padding: '96px 40px' }}>
+  <section id="how-it-works" className="problem-section" style={{ background: C.bgDarker, padding: '96px 40px' }}>
     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
       <motion.div
         variants={staggerContainer}
@@ -61,6 +61,7 @@ const ProblemSection: React.FC = () => (
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
         style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 20 }}
+        className="problems-grid"
       >
         {problems.map((p) => (
           <motion.div
@@ -90,7 +91,18 @@ const ProblemSection: React.FC = () => (
         ))}
       </motion.div>
     </div>
+
+    <style>{`
+      @media (max-width: 640px) {
+        .problem-section { padding: 56px 16px !important; }
+        .problems-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+        .problems-grid > div { padding: 16px 12px !important; border-radius: 12px !important; }
+        .problems-grid h3 { font-size: 13px !important; margin-bottom: 6px !important; }
+        .problems-grid p { font-size: 12px !important; }
+      }
+    `}</style>
   </section>
 );
 
 export default ProblemSection;
+

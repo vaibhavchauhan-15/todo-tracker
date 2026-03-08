@@ -40,7 +40,7 @@ const Footer: React.FC<FooterProps> = () => (
         className="footer-grid"
       >
         {/* Brand */}
-        <div>
+        <div className="footer-brand">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
             <img src="/logo.png" alt="TaskMaster" style={{ width: 32, height: 32, borderRadius: 9, objectFit: 'contain' }} />
             <span style={{ color: '#fff', fontWeight: 700, fontSize: 17 }}>
@@ -78,22 +78,23 @@ const Footer: React.FC<FooterProps> = () => (
         </div>
 
         {/* Columns */}
-        <div>
-          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 16, letterSpacing: '0.04em' }}>Product</div>
+        <div className="footer-col">
+          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 16, letterSpacing: '0.04em' }} className="footer-col-title">Product</div>
           {productLinks.map((l) => <FooterLink key={l} label={l} />)}
         </div>
-        <div>
-          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 16, letterSpacing: '0.04em' }}>Resources</div>
+        <div className="footer-col">
+          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 16, letterSpacing: '0.04em' }} className="footer-col-title">Resources</div>
           {resourceLinks.map((l) => <FooterLink key={l} label={l} />)}
         </div>
-        <div>
-          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 16, letterSpacing: '0.04em' }}>Company</div>
+        <div className="footer-col">
+          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 16, letterSpacing: '0.04em' }} className="footer-col-title">Company</div>
           {companyLinks.map((l) => <FooterLink key={l} label={l} />)}
         </div>
       </div>
 
       {/* Bottom bar */}
       <div
+        className="footer-bottom"
         style={{
           borderTop: `1px solid ${C.border}`, paddingTop: 24,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -118,11 +119,20 @@ const Footer: React.FC<FooterProps> = () => (
     </div>
 
     <style>{`
-      @media (max-width: 768px) {
-        .footer-grid { grid-template-columns: 1fr 1fr !important; }
-      }
-      @media (max-width: 480px) {
-        .footer-grid { grid-template-columns: 1fr !important; }
+      @media (max-width: 640px) {
+        footer { padding: 40px 16px 24px !important; }
+        .footer-grid {
+          grid-template-columns: 1fr 1fr 1fr !important;
+          gap: 24px 12px !important;
+        }
+        .footer-brand { grid-column: 1 / -1; }
+        .footer-brand p { display: none; }
+        .footer-brand > div:last-child { margin-top: 8px; }
+        .footer-col-title { font-size: 12px !important; margin-bottom: 10px !important; }
+        .footer-col a { font-size: 12px !important; }
+        .footer-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+        .footer-bottom > div { gap: 12px !important; flex-wrap: wrap; }
+        .footer-bottom a, .footer-bottom span { font-size: 11px !important; }
       }
     `}</style>
   </footer>
