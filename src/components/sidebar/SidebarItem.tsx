@@ -1,5 +1,6 @@
-﻿import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+﻿import React, { useState, useRef } from 'react';
+import ReactDOM from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebar } from './SidebarContext';
 
 interface SidebarItemProps {
@@ -14,10 +15,20 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, navKey, onClick,
   const { expanded, activeNav, setActiveNav } = useSidebar();
   const isActive = activeNav === navKey;
   const [hovered, setHovered] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
 
   const handleClick = () => {
     if (variant !== 'danger') setActiveNav(navKey);
     onClick?.();
+  };
+
+  const handleMouseEnter = () => {
+    setHovered(true);
+    if (btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setTooltipPos({ top: r.top + r.height / 2, left: r.right + 12 });
+    }
   };
 
   const accentColor = variant === 'danger' ? '#ef4444' : '#6366F1';
@@ -34,9 +45,10 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, navKey, onClick,
   return (
     <div style={{ position: 'relative' }}>
       <motion.button
+        ref={btnRef}
         type="button"
         onClick={handleClick}
-        onMouseEnter={() => setHovered(true)}
+        onMouseEnter={handleMouseEnter}
         onMouseLeave={() => setHovered(false)}
         whileTap={{ scale: 0.96 }}
         style={{
@@ -110,44 +122,57 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, navKey, onClick,
         </motion.span>
       </motion.button>
 
-      {/* Tooltip when collapsed */}
-      {tooltip && hovered && !expanded && (
-        <motion.div
-          initial={{ opacity: 0, x: -6 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -4 }}
-          transition={{ duration: 0.15 }}
-          style={{
-            position: 'absolute',
-            left: 'calc(100% + 12px)',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            background: 'var(--c-bg-card)',
-            border: '1px solid var(--c-border-accent)',
-            color: 'var(--c-text-primary)',
-            fontSize: 12,
-            fontWeight: 600,
-            padding: '5px 11px',
-            borderRadius: 8,
-            whiteSpace: 'nowrap',
-            zIndex: 9999,
-            boxShadow: '0 4px 24px rgba(0,0,0,0.25)',
-            pointerEvents: 'none',
-          }}
-        >
-          {label}
-          {/* Arrow */}
-          <span style={{
-            position: 'absolute',
-            right: '100%',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            borderTop: '5px solid transparent',
-            borderBottom: '5px solid transparent',
-            borderRight: '6px solid var(--c-bg-card)',
-          }} />
-        </motion.div>
-      )}
+      {/* Tooltip when collapsed — rendered via portal to escape sidebar overflow:hidden */}
+      <AnimatePresence>
+        {tooltip && hovered && !expanded && ReactDOM.createPortal(
+          <motion.div
+            initial={{ opacity: 0, x: -8, scale: 0.94 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -6, scale: 0.94 }}
+            transition={{ duration: 0.14, ease: 'easeOut' }}
+            style={{
+              position: 'fixed',
+              left: tooltipPos.left,
+              top: tooltipPos.top,
+              transform: 'translateY(-50%)',
+              background: 'var(--c-tooltip-bg)',
+              border: '1px solid var(--c-tooltip-border)',
+              color: 'var(--c-tooltip-text)',
+              fontSize: 12,
+              fontWeight: 600,
+              padding: '5px 10px',
+              borderRadius: 8,
+              whiteSpace: 'nowrap',
+              zIndex: 9999,
+              boxShadow: '0 4px 20px var(--c-tooltip-shadow)',
+              pointerEvents: 'none',
+            }}
+          >
+            {label}
+            <span style={{
+              position: 'absolute',
+              right: 'calc(100% - 1px)',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: 0, height: 0,
+              borderTop: '5px solid transparent',
+              borderBottom: '5px solid transparent',
+              borderRight: '6px solid var(--c-tooltip-border)',
+            }} />
+            <span style={{
+              position: 'absolute',
+              right: '100%',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: 0, height: 0,
+              borderTop: '4px solid transparent',
+              borderBottom: '4px solid transparent',
+              borderRight: '5px solid var(--c-tooltip-bg)',
+            }} />
+          </motion.div>,
+          document.body
+        )}
+      </AnimatePresence>
     </div>
   );
 };

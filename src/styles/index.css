@@ -61,6 +61,12 @@
   --c-priority-low:    #22c55e;
   --c-priority-urgent: #a855f7;
 
+  /* Tooltips */
+  --c-tooltip-bg:     #1e2235;
+  --c-tooltip-border: rgba(99, 102, 241, 0.55);
+  --c-tooltip-text:   #f1f5ff;
+  --c-tooltip-shadow: rgba(0, 0, 0, 0.40);
+
   color-scheme: dark;
 }
 
@@ -124,6 +130,12 @@
   --c-priority-medium: #d97706;
   --c-priority-low:    #16a34a;
   --c-priority-urgent: #9333ea;
+
+  /* Tooltips */
+  --c-tooltip-bg:     #ffffff;
+  --c-tooltip-border: rgba(99, 102, 241, 0.60);
+  --c-tooltip-text:   #111827;
+  --c-tooltip-shadow: rgba(0, 0, 0, 0.22);
 
   color-scheme: light;
 }
