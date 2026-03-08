@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useSidebar } from './sidebar/SidebarContext';
 import Sidebar from './sidebar/Sidebar';
 import MobileBottomNav from './MobileBottomNav';
@@ -59,19 +58,19 @@ const Layout: React.FC<LayoutProps> = ({ user, children, onCreateTask, onLogout,
         streak={streak ?? 0}
       />
 
-      {/* Main content — shifts with sidebar */}
-      <motion.main
-        animate={{ marginLeft: expanded ? SIDEBAR_EXPANDED : SIDEBAR_COLLAPSED }}
-        transition={{ type: 'spring', stiffness: 320, damping: 38 }}
+      {/* Main content — shifts with sidebar via CSS transition */}
+      <main
         style={{
           flex: 1,
           minHeight: '100vh',
           overflowX: 'hidden',
           background: 'var(--c-bg)',
+          marginLeft: expanded ? SIDEBAR_EXPANDED : SIDEBAR_COLLAPSED,
+          transition: 'margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         {children}
-      </motion.main>
+      </main>
     </div>
   );
 };

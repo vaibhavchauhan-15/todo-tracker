@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './lib/supabaseClient';
 import { ThemeProvider } from './contexts/ThemeContext';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Home from './pages/Home';
-import LandingPage from './pages/LandingPage';
+
+const Login      = lazy(() => import('./pages/Login'));
+const Signup     = lazy(() => import('./pages/Signup'));
+const Home       = lazy(() => import('./pages/Home'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
 
 interface UserData {
   uid: string;
@@ -76,26 +77,28 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Routes>
-          <Route path="/" element={user ? <Navigate to="/app" replace /> : <LandingPage />} />
-          <Route 
-            path="/login" 
-            element={user ? <Navigate to="/app" /> : <Login onAuthStateChange={setUser} />} 
-          />
-          <Route 
-            path="/signup" 
-            element={user ? <Navigate to="/app" /> : <Signup onAuthStateChange={setUser} />} 
-          />
-          <Route 
-            path="/app" 
-            element={
-              <ProtectedRoute user={user}>
-                <Home user={user!} />
-              </ProtectedRoute>
-            } 
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={user ? <Navigate to="/app" replace /> : <LandingPage />} />
+            <Route 
+              path="/login" 
+              element={user ? <Navigate to="/app" /> : <Login onAuthStateChange={setUser} />} 
+            />
+            <Route 
+              path="/signup" 
+              element={user ? <Navigate to="/app" /> : <Signup onAuthStateChange={setUser} />} 
+            />
+            <Route 
+              path="/app" 
+              element={
+                <ProtectedRoute user={user}>
+                  <Home user={user!} />
+                </ProtectedRoute>
+              } 
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </Router>
     </ThemeProvider>
   );

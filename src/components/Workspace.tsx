@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Sparkles, X } from 'lucide-react';
 import { Category, Task, StreakData, CATEGORIES } from './workspace/types';
@@ -7,10 +7,10 @@ import { getTodos, createTodo, updateTodo, deleteTodo } from '../services/todoSe
 import EmptyState from './workspace/EmptyState';
 import DeleteDialog from './workspace/DeleteDialog';
 import TaskCard from './workspace/TaskCard';
-import AITaskPanel from './AITaskPanel';
 import TaskFormFields, { TaskFormData } from './workspace/TaskFormFields';
 import Btn18 from './ui/Btn18';
 import { AITasksResult } from '../ai/groq';
+const AITaskPanel = lazy(() => import('./AITaskPanel'));
 
 interface WorkspaceProps {
   user: any;
@@ -53,7 +53,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
   const isMobile                        = useIsMobile();
   const activeCategory: Category        = (activeView !== 'all' && activeView !== 'completed') ? activeView as Category : 'daily';
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   /* ── Load tasks from Supabase on mount ── */
   useEffect(() => {
@@ -338,20 +338,20 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
     });
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = useCallback(() => {
     if (!deleteId) return;
     const id = deleteId;
     const removed = tasks.find(t => t.id === id);
-    setDeleteId(null); // close dialog immediately
+    setDeleteId(null);
     setTasks(prev => prev.filter(t => t.id !== id));
     deleteTodo(id).catch(err => {
       console.error('Failed to delete task:', err);
-      // Revert on failure
       if (removed) setTasks(prev => [removed, ...prev]);
     });
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deleteId, tasks]);
 
-  const openEdit = (task: Task) => {
+  const openEdit = useCallback((task: Task) => {
     setEditingId(task.id);
     setPanelForm({
       title:       task.title,
@@ -363,44 +363,41 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
     });
     setPanelMode('edit');
     setPanelOpen(true);
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [today]);
 
   /* ── Derived data ── */
-  const sortTasks = (list: Task[]) => {
-    return [...list].sort((a, b) => {
-      // Completed always go to the bottom
+  const filtered = useMemo(() => {
+    const base =
+      activeView === 'all'
+        ? tasks
+        : activeView === 'completed'
+        ? tasks.filter(t => t.status === 'completed')
+        : tasks.filter(t => (t.category ?? 'daily') === activeView);
+
+    return [...base].sort((a, b) => {
       if (a.status === 'completed' && b.status !== 'completed') return 1;
       if (a.status !== 'completed' && b.status === 'completed') return -1;
-
-      // Combine date + time into a comparable string (YYYY-MM-DDTHH:MM)
       const key = (t: Task) => {
         const d = t.dueDate?.trim() ?? '';
         const time = t.dueTime?.trim() ?? '';
         if (d && time) return `${d}T${time}`;
-        if (d)         return `${d}T99:99`; // date but no time → after timed tasks that day
-        if (time)      return `0000-00-00T${time}`; // time but no date → near top
-        return '9999-99-99T99:99'; // no date & no time → very bottom
+        if (d)         return `${d}T99:99`;
+        if (time)      return `0000-00-00T${time}`;
+        return '9999-99-99T99:99';
       };
-
       const ka = key(a);
       const kb = key(b);
       if (ka !== kb) return ka < kb ? -1 : 1;
-
-      // Stable fallback: newer tasks first within same slot
       return (b.createdAt ?? '').localeCompare(a.createdAt ?? '');
     });
-  };
+  }, [tasks, activeView]);
 
-  const filtered = sortTasks(
-    activeView === 'all'
-      ? tasks
-      : activeView === 'completed'
-      ? tasks.filter(t => t.status === 'completed')
-      : tasks.filter(t => (t.category ?? 'daily') === activeView)
-  );
-  const pending   = filtered.filter(t => t.status === 'pending').length;
-  const done      = filtered.filter(t => t.status === 'completed').length;
-  const total     = filtered.length;
+  const { pending, done, total } = useMemo(() => ({
+    pending: filtered.filter(t => t.status === 'pending').length,
+    done:    filtered.filter(t => t.status === 'completed').length,
+    total:   filtered.length,
+  }), [filtered]);
 
   /* ─── Render ─────────────────────────────────────────────── */
   return (
@@ -703,11 +700,13 @@ const Workspace: React.FC<WorkspaceProps> = ({ user, externalCategory, navView, 
       </AnimatePresence>
 
       {/* ── AI Generate Drawer ── */}
-      <AITaskPanel
-        isOpen={aiOpen}
-        onClose={() => setAiOpen(false)}
-        onAddTasks={handleAIAddTasks}
-      />
+      <Suspense fallback={null}>
+        <AITaskPanel
+          isOpen={aiOpen}
+          onClose={() => setAiOpen(false)}
+          onAddTasks={handleAIAddTasks}
+        />
+      </Suspense>
     </div>
   );
 };

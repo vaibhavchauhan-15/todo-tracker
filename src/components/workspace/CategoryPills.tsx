@@ -30,4 +30,4 @@ const CategoryPills: React.FC<CategoryPillsProps> = ({ value, onChange }) => (
   </div>
 );
 
-export default CategoryPills;
+export default React.memo(CategoryPills);

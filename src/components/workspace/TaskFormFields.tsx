@@ -112,4 +112,4 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, onChange, isMobil
   </>
 );
 
-export default TaskFormFields;
+export default React.memo(TaskFormFields);

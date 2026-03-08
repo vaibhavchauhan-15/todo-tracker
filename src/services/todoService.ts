@@ -22,7 +22,7 @@ const toTask = (row: Record<string, unknown>): Task => ({
 export const getTodos = async (userId: string): Promise<Task[]> => {
   const { data, error } = await supabase
     .from('todos')
-    .select('*')
+    .select('id,user_id,title,description,priority,category,status,completed,streak,last_completed_date,due_date,due_time,created_at,updated_at')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 

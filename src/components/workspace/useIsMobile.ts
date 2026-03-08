@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 
 export function useIsMobile(): boolean {
-  const [w, setW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 640 : false,
+  );
+
   useEffect(() => {
-    const handler = () => setW(window.innerWidth);
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
+    let timer: ReturnType<typeof setTimeout>;
+    const handler = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => setIsMobile(window.innerWidth < 640), 100);
+    };
+    window.addEventListener('resize', handler, { passive: true });
+    return () => { clearTimeout(timer); window.removeEventListener('resize', handler); };
   }, []);
-  return w < 640;
+
+  return isMobile;
 }

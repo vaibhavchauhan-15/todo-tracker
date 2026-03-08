@@ -29,4 +29,4 @@ const EmptyState: React.FC<{ category: Category }> = ({ category }) => {
   );
 };
 
-export default EmptyState;
+export default React.memo(EmptyState);

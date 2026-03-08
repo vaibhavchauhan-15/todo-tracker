@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, ChevronDown, Trash2, AlertCircle, Loader2, CalendarDays, Clock } from 'lucide-react';
 import Btn18 from './ui/Btn18';
@@ -406,9 +406,8 @@ const AITaskPanel: React.FC<AITaskPanelProps> = ({ isOpen, onClose, onAddTasks }
     ? result.daily.length + result.weekly.length + result.monthly.length + result.yearly.length
     : 0;
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     onClose();
-    // Reset state after drawer animates out
     setTimeout(() => {
       setPrompt('');
       setGoalType('custom');
@@ -417,9 +416,9 @@ const AITaskPanel: React.FC<AITaskPanelProps> = ({ isOpen, onClose, onAddTasks }
       setError(null);
       setResult(null);
     }, 350);
-  };
+  }, [onClose]);
 
-  const handleGenerate = async () => {
+  const handleGenerate = useCallback(async () => {
     const trimmed = prompt.trim();
     if (!trimmed) return;
     setLoading(true);
@@ -433,22 +432,23 @@ const AITaskPanel: React.FC<AITaskPanelProps> = ({ isOpen, onClose, onAddTasks }
     } finally {
       setLoading(false);
     }
-  };
+  }, [prompt, goalType, timeCommitment, categoryFilter]);
 
-  const updateTask = (category: Category, index: number, updated: AITask) => {
-    if (!result) return;
-    setResult({
-      ...result,
-      [category]: result[category].map((t, i) => (i === index ? updated : t)),
+  const updateTask = useCallback((category: Category, index: number, updated: AITask) => {
+    setResult(prev => {
+      if (!prev) return prev;
+      return { ...prev, [category]: prev[category].map((t, i) => (i === index ? updated : t)) };
     });
-  };
+  }, []);
 
-  const removeTask = (category: Category, index: number) => {
-    if (!result) return;
-    setResult({ ...result, [category]: result[category].filter((_, i) => i !== index) });
-  };
+  const removeTask = useCallback((category: Category, index: number) => {
+    setResult(prev => {
+      if (!prev) return prev;
+      return { ...prev, [category]: prev[category].filter((_, i) => i !== index) };
+    });
+  }, []);
 
-  const handleAddAll = async () => {
+  const handleAddAll = useCallback(async () => {
     if (!result || totalCount === 0) return;
     setSaving(true);
     try {
@@ -459,7 +459,7 @@ const AITaskPanel: React.FC<AITaskPanelProps> = ({ isOpen, onClose, onAddTasks }
     } finally {
       setSaving(false);
     }
-  };
+  }, [result, totalCount, onAddTasks, handleClose]);
 
   const catMeta: { key: Category; label: string; color: string }[] = [
     { key: 'daily',   label: 'Daily',   color: '#a78bfa' },

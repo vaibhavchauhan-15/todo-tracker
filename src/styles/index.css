@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Inter font is loaded asynchronously via <link preload> in public/index.html */
 
 /* ═══════════════════════════════════════════════════════════
    DESIGN TOKENS — Dark theme (default, matches landing page)
@@ -250,4 +250,161 @@ input::placeholder, textarea::placeholder {
 .btn-accent:hover {
   background: var(--c-accent-bg-hover);
   box-shadow: 0 0 0 3px var(--c-accent-glow-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BTN18 — replaces styled-components version
+   ═══════════════════════════════════════════════════════════ */
+.btn18 {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: button;
+  background-color: #6366F1;
+  background-image: none;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.5;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 99rem;
+  border: 3px solid #fff;
+  padding: 0.8rem 3rem;
+  z-index: 0;
+  overflow: hidden;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition: color 0.3s;
+  box-shadow: 0 2px 12px rgba(255,255,255,0.06);
+  box-sizing: border-box;
+}
+.btn18:disabled {
+  cursor: default;
+  opacity: 0.45;
+  pointer-events: none;
+}
+.btn18-light {
+  background-color: #fff;
+  color: #6366F1;
+  border-color: #6366F1;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.btn18:hover { color: #6366F1; }
+.btn18-light:hover { color: #fff; }
+
+.btn18-text-container {
+  overflow: hidden;
+  position: relative;
+  display: block;
+}
+.btn18-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+.btn18:hover .btn18-text {
+  animation: btn18-move-up 0.3s forwards;
+}
+@keyframes btn18-move-up {
+  0%   { transform: translateY(0);    }
+  50%  { transform: translateY(80%);  }
+  51%  { transform: translateY(-80%); }
+  100% { transform: translateY(0);    }
+}
+.btn18::before,
+.btn18::after {
+  --tilt: 20px;
+  background: #fff;
+  content: '';
+  height: 100%;
+  position: absolute;
+  top: 0;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+}
+.btn18-light::before,
+.btn18-light::after { background: #6366F1; }
+.btn18::before {
+  clip-path: polygon(0 0, calc(100% - var(--tilt)) 0, 100% 50%, calc(100% - var(--tilt)) 100%, 0 100%);
+  left: -100%;
+}
+.btn18::after {
+  clip-path: polygon(var(--tilt) 0, 0 50%, var(--tilt) 100%, 100% 100%, 100% 0);
+  left: 100%;
+  z-index: -1;
+}
+.btn18:hover::before { transform: translateX(100%); }
+.btn18:hover::after  { transform: translateX(-100%); }
+
+/* ═══════════════════════════════════════════════════════════
+   GLOW BUTTON — replaces styled-components version
+   ═══════════════════════════════════════════════════════════ */
+.glow-btn {
+  position: relative;
+  width: fit-content;
+  height: 40px;
+  background-color: #000;
+  display: inline-flex;
+  align-items: center;
+  color: white;
+  justify-content: center;
+  border: none;
+  padding: 12px 20px;
+  gap: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.glow-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  left: -4px;
+  top: -1px;
+  margin: auto;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  border-radius: 10px;
+  background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
+  z-index: -10;
+  pointer-events: none;
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.glow-btn::after {
+  content: '';
+  z-index: -1;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(-45deg, #fc00ff 0%, #00dbde 100%);
+  transform: translate3d(0, 0, 0) scale(0.95);
+  filter: blur(20px);
+  transition: filter 0.3s;
+}
+.glow-btn:hover::after  { filter: blur(30px); }
+.glow-btn:hover::before { transform: rotate(-180deg); }
+.glow-btn:active::before { scale: 0.7; }
+.glow-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════════════════
+   LANDING PAGE RESPONSIVE HELPERS
+   ═══════════════════════════════════════════════════════════ */
+.landing-navbar { contain: layout style; }
+
+/* Reduce heavy animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

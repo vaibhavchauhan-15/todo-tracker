@@ -160,4 +160,4 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(function TaskCa
   );
 });
 
-export default TaskCard;
+export default React.memo(TaskCard);

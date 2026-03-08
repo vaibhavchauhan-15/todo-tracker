@@ -53,10 +53,8 @@ export const PrimaryButton: React.FC<{
   onClick?: () => void;
   large?: boolean;
   style?: React.CSSProperties;
-}> = ({ children, onClick, large, style }) => (
+}> = ({ children, onClick, style }) => (
   <Btn18
-    variant="primary"
-    size={large ? 'large' : 'default'}
     onClick={onClick}
     style={style}
   >
@@ -73,7 +71,6 @@ export const SecondaryButton: React.FC<{
   style?: React.CSSProperties;
 }> = ({ children, onClick, style }) => (
   <Btn18
-    variant="secondary"
     onClick={onClick}
     style={style}
   >

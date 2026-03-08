@@ -37,4 +37,4 @@ const PriorityPills: React.FC<PriorityPillsProps> = ({ value, onChange }) => (
   </div>
 );
 
-export default PriorityPills;
+export default React.memo(PriorityPills);

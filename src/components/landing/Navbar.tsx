@@ -77,7 +77,7 @@ const Navbar: React.FC<NavbarProps> = ({ onGetStarted, onLogin }) => {
 
         {/* CTA */}
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <Btn18 variant="secondary" onClick={onLogin}>
+          <Btn18 onClick={onLogin}>
             Log in
           </Btn18>
           <GlowButton onClick={onGetStarted}>Get Started Free</GlowButton>
@@ -132,7 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({ onGetStarted, onLogin }) => {
             ))}
 
             <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <Btn18 variant="secondary" onClick={onLogin} style={{ width: '100%', justifyContent: 'center' }}>Log in</Btn18>
+              <Btn18 onClick={onLogin} style={{ width: '100%', justifyContent: 'center' }}>Log in</Btn18>
               <GlowButton onClick={onGetStarted}>Get Started Free</GlowButton>
             </div>
           </motion.div>

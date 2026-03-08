@@ -63,7 +63,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onGetStarted }) => (
               </div>
             ))}
           </div>
-          <Btn18 variant="primary" onClick={onGetStarted} className="cta-btn" style={{ width: '100%', marginTop: 20, justifyContent: 'center', fontSize: 13, letterSpacing: '0.06em' }}>
+          <Btn18 onClick={onGetStarted} className="cta-btn" style={{ width: '100%', marginTop: 20, justifyContent: 'center', fontSize: 13, letterSpacing: '0.06em' }}>
             Get Started Free
           </Btn18>
         </motion.div>
@@ -114,7 +114,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onGetStarted }) => (
               </div>
             ))}
           </div>
-          <Btn18 variant="primary" onClick={onGetStarted} className="cta-btn" style={{ width: '100%', marginTop: 20, justifyContent: 'center', fontSize: 13, letterSpacing: '0.06em' }}>
+          <Btn18 onClick={onGetStarted} className="cta-btn" style={{ width: '100%', marginTop: 20, justifyContent: 'center', fontSize: 13, letterSpacing: '0.06em' }}>
             Start Pro Free <ArrowRight size={14} />
           </Btn18>
         </motion.div>
