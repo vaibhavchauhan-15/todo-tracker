@@ -217,7 +217,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onCreateTask, onLogout, onNavCh
                 fontSize: 15, fontWeight: 800, color: 'var(--c-text-primary)',
                 letterSpacing: '-0.025em', whiteSpace: 'nowrap',
               }}>
-                TaskMaster
+                Task<span style={{
+                  background: 'linear-gradient(135deg, #818CF8 0%, #6366F1 40%, #22C55E 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>Master</span>
               </span>
             </motion.div>
           )}
@@ -294,6 +299,8 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onCreateTask, onLogout, onNavCh
               }}>
                 {user.photoURL && !avatarError ? (
                   <img src={user.photoURL} alt={initials}
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                     onError={() => setAvatarError(true)}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : initials}

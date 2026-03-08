@@ -87,6 +87,8 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 <img
                   src={user.photoURL}
                   alt={initials}
+                  referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
                   onError={() => setAvatarError(true)}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
